@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{9FA7F317-62F5-4DAB-9150-5D6060E85EBF}</ProjectGuid>
+    <Keyword>MFCProj</Keyword>
+    <RootNamespace>UpperMachineSoftware</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>Dynamic</UseOfMfc>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\projects\UpperMachineSoftware\UpperMachineSoftware;D:\projects\UpperMachineSoftware\UpperMachineSoftware\inc;D:\projects\UpperMachineSoftware\UpperMachineSoftware\ChartClass;D:\projects\UpperMachineSoftware\UpperMachineSoftware\algorithm\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\projects\UpperMachineSoftware\UpperMachineSoftware\algorithm\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>D:\projects\UpperMachineSoftware\UpperMachineSoftware;D:\opencv\build\include\opencv2;D:\opencv\build\include;D:\projects\UpperMachineSoftware\UpperMachineSoftware\inc;D:\projects\UpperMachineSoftware\UpperMachineSoftware\algorithm\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\opencv\build\x64\vc15\lib;D:\projects\UpperMachineSoftware\UpperMachineSoftware\algorithm\lib;$(LibraryPath)</LibraryPath>
+    <SourcePath>$(SourcePath)</SourcePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_WINDOWS;NDEBUG;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>opencv_world453.lib;binaryzation.lib;perspective_transform.lib;auxiliary_line.lib;user_process.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <Midl>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+      <ValidateAllParameters>true</ValidateAllParameters>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </Midl>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="ChartClass\ChartAxis.h" />
+    <ClInclude Include="ChartClass\ChartAxisLabel.h" />
+    <ClInclude Include="ChartClass\ChartBalloonLabel.h" />
+    <ClInclude Include="ChartClass\ChartBarSerie.h" />
+    <ClInclude Include="ChartClass\ChartCandlestickSerie.h" />
+    <ClInclude Include="ChartClass\ChartCrossHairCursor.h" />
+    <ClInclude Include="ChartClass\ChartCtrl.h" />
+    <ClInclude Include="ChartClass\ChartCursor.h" />
+    <ClInclude Include="ChartClass\ChartDateTimeAxis.h" />
+    <ClInclude Include="ChartClass\ChartDragLineCursor.h" />
+    <ClInclude Include="ChartClass\ChartFont.h" />
+    <ClInclude Include="ChartClass\ChartGanttSerie.h" />
+    <ClInclude Include="ChartClass\ChartGradient.h" />
+    <ClInclude Include="ChartClass\ChartGrid.h" />
+    <ClInclude Include="ChartClass\ChartLabel.h" />
+    <ClInclude Include="ChartClass\ChartLegend.h" />
+    <ClInclude Include="ChartClass\ChartLineSerie.h" />
+    <ClInclude Include="ChartClass\ChartLogarithmicAxis.h" />
+    <ClInclude Include="ChartClass\ChartMouseListener.h" />
+    <ClInclude Include="ChartClass\ChartPointsArray.h" />
+    <ClInclude Include="ChartClass\ChartPointsSerie.h" />
+    <ClInclude Include="ChartClass\ChartScrollBar.h" />
+    <ClInclude Include="ChartClass\ChartSerie.h" />
+    <ClInclude Include="ChartClass\ChartSerieBase.h" />
+    <ClInclude Include="ChartClass\ChartSeriesMouseListener.h" />
+    <ClInclude Include="ChartClass\ChartStandardAxis.h" />
+    <ClInclude Include="ChartClass\ChartString.h" />
+    <ClInclude Include="ChartClass\ChartSurfaceSerie.h" />
+    <ClInclude Include="ChartClass\ChartTitle.h" />
+    <ClInclude Include="ChartClass\ChartXYSerie.h" />
+    <ClInclude Include="ChartClass\PointsOrdering.h" />
+    <ClInclude Include="ChartClass\stdafx.h" />
+    <ClInclude Include="ChartClass\targetver.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="inc\CFileLook.h" />
+    <ClInclude Include="inc\CNetClient.h" />
+    <ClInclude Include="inc\CNetServer.h" />
+    <ClInclude Include="inc\CPixelSrc.h" />
+    <ClInclude Include="inc\CRTWaveform.h" />
+    <ClInclude Include="inc\CSimpleInfo.h" />
+    <ClInclude Include="inc\CSmartCarCam.h" />
+    <ClInclude Include="inc\CUart.h" />
+    <ClInclude Include="inc\CVeerShow.h" />
+    <ClInclude Include="inc\DataSrcParam.hpp" />
+    <ClInclude Include="inc\log.h" />
+    <ClInclude Include="inc\matrix.h" />
+    <ClInclude Include="inc\MyQueue.h" />
+    <ClInclude Include="inc\queue_cache.h" />
+    <ClInclude Include="inc\SmartCarCam.h" />
+    <ClInclude Include="inc\sock.h" />
+    <ClInclude Include="inc\ThreadSafeQueue.hpp" />
+    <ClInclude Include="inc\timer.h" />
+    <ClInclude Include="inc\uart.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="targetver.h" />
+    <ClInclude Include="UpperMachineSoftware.h" />
+    <ClInclude Include="UpperMachineSoftwareDlg.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ChartClass\ChartAxis.cpp" />
+    <ClCompile Include="ChartClass\ChartAxisLabel.cpp" />
+    <ClCompile Include="ChartClass\ChartBarSerie.cpp" />
+    <ClCompile Include="ChartClass\ChartCandlestickSerie.cpp" />
+    <ClCompile Include="ChartClass\ChartCrossHairCursor.cpp" />
+    <ClCompile Include="ChartClass\ChartCtrl.cpp" />
+    <ClCompile Include="ChartClass\ChartCursor.cpp" />
+    <ClCompile Include="ChartClass\ChartDateTimeAxis.cpp" />
+    <ClCompile Include="ChartClass\ChartDragLineCursor.cpp" />
+    <ClCompile Include="ChartClass\ChartFont.cpp" />
+    <ClCompile Include="ChartClass\ChartGanttSerie.cpp" />
+    <ClCompile Include="ChartClass\ChartGradient.cpp" />
+    <ClCompile Include="ChartClass\ChartGrid.cpp" />
+    <ClCompile Include="ChartClass\ChartLegend.cpp" />
+    <ClCompile Include="ChartClass\ChartLineSerie.cpp" />
+    <ClCompile Include="ChartClass\ChartLogarithmicAxis.cpp" />
+    <ClCompile Include="ChartClass\ChartPointsSerie.cpp" />
+    <ClCompile Include="ChartClass\ChartScrollBar.cpp" />
+    <ClCompile Include="ChartClass\ChartSerie.cpp" />
+    <ClCompile Include="ChartClass\ChartStandardAxis.cpp" />
+    <ClCompile Include="ChartClass\ChartSurfaceSerie.cpp" />
+    <ClCompile Include="ChartClass\ChartTitle.cpp" />
+    <ClCompile Include="ChartClass\ChartXYSerie.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\CFileLook.cpp" />
+    <ClCompile Include="src\CNetClient.cpp" />
+    <ClCompile Include="src\CNetServer.cpp" />
+    <ClCompile Include="src\CPixelSrc.cpp" />
+    <ClCompile Include="src\CRTWaveform.cpp" />
+    <ClCompile Include="src\CSimpleInfo.cpp" />
+    <ClCompile Include="src\CSmartCarCam.cpp" />
+    <ClCompile Include="src\CUart.cpp" />
+    <ClCompile Include="src\CVeerShow.cpp" />
+    <ClCompile Include="src\log.cpp" />
+    <ClCompile Include="src\matrix.cpp" />
+    <ClCompile Include="src\SmartCarCam.cpp" />
+    <ClCompile Include="src\sock.cpp" />
+    <ClCompile Include="src\uart.cpp" />
+    <ClCompile Include="UpperMachineSoftware.cpp" />
+    <ClCompile Include="UpperMachineSoftwareDlg.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UpperMachineSoftware.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ChartClass\ChartBalloonLabel.inl" />
+    <None Include="ChartClass\ChartLabel.inl" />
+    <None Include="ChartClass\ChartPointsArray.inl" />
+    <None Include="ChartClass\ChartSerieBase.inl" />
+    <None Include="res\UpperMachineSoftware.rc2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\UpperMachineSoftware.ico" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
