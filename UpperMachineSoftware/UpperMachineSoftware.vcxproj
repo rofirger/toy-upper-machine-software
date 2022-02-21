@@ -231,7 +231,7 @@
     <ClInclude Include="inc\CPixelSrc.h" />
     <ClInclude Include="inc\CRTWaveform.h" />
     <ClInclude Include="inc\CSimpleInfo.h" />
-    <ClInclude Include="inc\CSmartCarCam.h" />
+    <ClInclude Include="inc\CImgProcess.h" />
     <ClInclude Include="inc\CUart.h" />
     <ClInclude Include="inc\CVeerShow.h" />
     <ClInclude Include="inc\DataSrcParam.hpp" />
@@ -239,7 +239,6 @@
     <ClInclude Include="inc\matrix.h" />
     <ClInclude Include="inc\MyQueue.h" />
     <ClInclude Include="inc\queue_cache.h" />
-    <ClInclude Include="inc\SmartCarCam.h" />
     <ClInclude Include="inc\sock.h" />
     <ClInclude Include="inc\ThreadSafeQueue.hpp" />
     <ClInclude Include="inc\timer.h" />
@@ -286,12 +285,11 @@
     <ClCompile Include="src\CPixelSrc.cpp" />
     <ClCompile Include="src\CRTWaveform.cpp" />
     <ClCompile Include="src\CSimpleInfo.cpp" />
-    <ClCompile Include="src\CSmartCarCam.cpp" />
+    <ClCompile Include="src\CImgProcess.cpp" />
     <ClCompile Include="src\CUart.cpp" />
     <ClCompile Include="src\CVeerShow.cpp" />
     <ClCompile Include="src\log.cpp" />
     <ClCompile Include="src\matrix.cpp" />
-    <ClCompile Include="src\SmartCarCam.cpp" />
     <ClCompile Include="src\sock.cpp" />
     <ClCompile Include="src\uart.cpp" />
     <ClCompile Include="UpperMachineSoftware.cpp" />

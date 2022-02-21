@@ -12,7 +12,7 @@ extern double* _x;
 CString app_open_file_path;
 
 CUpperMachineSoftwareDlg::CUpperMachineSoftwareDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_UARTDISPLAY_DIALOG, pParent)
+	: CDialogEx(IDD_UPPERMACHINE_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -48,7 +48,7 @@ BOOL CUpperMachineSoftwareDlg::OnInitDialog()
 	m_tab.InsertItem(2, _T("实时数据变化波形化"));
 
 	uart_simple.Create(IDD_SIMPLEINFO, GetDlgItem(IDC_TAB1));
-	uart_pic.Create(IDD_SMARTCARCAM, GetDlgItem(IDC_TAB1));
+	uart_pic.Create(IDD_IMGPROCESS, GetDlgItem(IDC_TAB1));
 	uart_rtwaveform.Create(IDD_PID, GetDlgItem(IDC_TAB1));
 
 	//子窗口大小设置,不设置的话会把tab标题给覆盖掉

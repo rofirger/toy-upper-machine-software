@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include "CSimpleInfo.h"
-#include "SmartCarCam.h"
-#include "CSmartCarCam.h"
+#include "CImgProcess.h"
 #include "CRTWaveform.h"
 #include <vector>
 
@@ -14,7 +13,7 @@ public:
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_UARTDISPLAY_DIALOG };
+	enum { IDD = IDD_UPPERMACHINE_DIALOG };
 #endif
 
 protected:

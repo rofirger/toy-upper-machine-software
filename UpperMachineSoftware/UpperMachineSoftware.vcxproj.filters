@@ -54,7 +54,7 @@
     <ClInclude Include="inc\CSimpleInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="inc\CSmartCarCam.h">
+    <ClInclude Include="inc\CImgProcess.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="inc\CUart.h">
@@ -76,9 +76,6 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="inc\queue_cache.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="inc\SmartCarCam.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="inc\sock.h">
@@ -221,7 +218,7 @@
     <ClCompile Include="src\CSimpleInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\CSmartCarCam.cpp">
+    <ClCompile Include="src\CImgProcess.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\CUart.cpp">
@@ -234,9 +231,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\matrix.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\SmartCarCam.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\sock.cpp">

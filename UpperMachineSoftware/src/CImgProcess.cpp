@@ -2,7 +2,7 @@
 
 #include "pch.h"
 #include "UpperMachineSoftware.h"
-#include "CSmartCarCam.h"
+#include "CImgProcess.h"
 #include "afxdialogex.h"
 #include "CSimpleInfo.h"
 #include <opencv2/opencv.hpp>
@@ -28,7 +28,7 @@ using namespace cv;
 IMPLEMENT_DYNAMIC(CSmartCarCam, CDialogEx)
 
 CSmartCarCam::CSmartCarCam(CWnd* pParent)
-	: CDialogEx(IDD_SMARTCARCAM, pParent),
+	: CDialogEx(IDD_IMGPROCESS, pParent),
 	data_src_param(this, &process_pic_func_param, this, this, EnableControlForDataSrc, PicDataProcess, UpdateCSCCData, ClearCSCCDate, true, raw_pic_data, raw_pic_data_ele_size),
 	forms_cam_uart(data_src_param), forms_cam_net_server(data_src_param), forms_cam_net_client(data_src_param)
 {
@@ -280,9 +280,9 @@ BOOL CSmartCarCam::OnInitDialog()
 	m_tab_mode.InsertItem(0, _T("串口"));
 	m_tab_mode.InsertItem(1, _T("TCP服务器"));
 	m_tab_mode.InsertItem(2, _T("TCP客户端"));
-	forms_cam_uart.Create(IDD_CAM_UART, GetDlgItem(IDC_TAB_MODE));
-	forms_cam_net_server.Create(IDD_CAM_NET_SERVER, GetDlgItem(IDC_TAB_MODE));
-	forms_cam_net_client.Create(IDD_CAM_NET_CLIENT, GetDlgItem(IDC_TAB_MODE));
+	forms_cam_uart.Create(IDD_UART, GetDlgItem(IDC_TAB_MODE));
+	forms_cam_net_server.Create(IDD_NET_SERVER, GetDlgItem(IDC_TAB_MODE));
+	forms_cam_net_client.Create(IDD_NET_CLIENT, GetDlgItem(IDC_TAB_MODE));
 	//子窗口大小设置,不设置的话会把tab标题给覆盖掉
 	CRect rect_tab;
 	m_tab_mode.GetClientRect(rect_tab);

@@ -2,17 +2,17 @@
 // Microsoft Visual C++ 生成的包含文件。
 // 供 UARTDisplay.rc 使用
 //
-#define IDD_UARTDISPLAY_DIALOG          102
+#define IDD_UPPERMACHINE_DIALOG          102
 #define IDR_MAINFRAME                   128
-#define IDD_SMARTCARCAM                 130
+#define IDD_IMGPROCESS                 130
 #define IDD_SIMPLEINFO                  132
 #define IDD_PID                         134
 #define IDD_PIXEL_SRC                   136
 #define IDD_FILE_LOOK                   138
 #define IDD_VEER                        144
-#define IDD_CAM_UART                    146
-#define IDD_CAM_NET_SERVER              150
-#define IDD_CAM_NET_CLIENT              152
+#define IDD_UART                    146
+#define IDD_NET_SERVER              150
+#define IDD_NET_CLIENT              152
 #define IDD_DIALOG_NET_SERVER_WAIT      154
 #define IDC_TAB1                        1000
 #define IDC_COMBO1                      1004

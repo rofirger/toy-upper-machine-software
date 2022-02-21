@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 // CPixelSrc 对话框
-#include "CSmartCarCam.h"
+#include "CImgProcess.h"
 #include <vector>
 class CPixelSrc : public CDialogEx
 {

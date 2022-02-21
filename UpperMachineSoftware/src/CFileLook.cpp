@@ -1,21 +1,11 @@
-﻿// CFileLook.cpp: 实现文件
-//
-
-#include "pch.h"
+﻿#include "pch.h"
 #include "UpperMachineSoftware.h"
 #include "CFileLook.h"
 #include "afxdialogex.h"
 #include <fstream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/utils/logger.hpp>
-// CFileLook 对话框
-
 IMPLEMENT_DYNAMIC(CFileLook, CDialogEx)
-
-//CFileLook::CFileLook(CWnd* pParent /*=nullptr*/)
-//	: CDialogEx(IDD_FILE_LOOK, pParent)
-//{
-//}
 CFileLook::CFileLook(std::vector<CString>& f, bool& close_param) : file(f), close_(close_param) {}
 
 CFileLook::~CFileLook()
@@ -41,7 +31,6 @@ BEGIN_MESSAGE_MAP(CFileLook, CDialogEx)
 	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
-// CFileLook 消息处理程序
 void Split(CString source, CStringArray& dest, CString division)
 {
 	dest.RemoveAll();
@@ -62,7 +51,6 @@ BOOL CFileLook::OnInitDialog()
 	m_slider_zoom_raw.SetRange(1, 10);
 	m_slider_zoom_raw.SetTicFreq(1);
 	m_slider_zoom_raw.SetPos(1);
-	// TODO:  在此添加额外的初始化
 	for (int i = 0; i < file.size(); ++i)
 	{
 		CStringArray dest;
@@ -85,14 +73,11 @@ BOOL CFileLook::OnInitDialog()
 	}
 	m_list.SetCurSel(0);
 
-	return TRUE;  // return TRUE unless you set the focus to a control
-				  // 异常: OCX 属性页应返回 FALSE
+	return TRUE;
 }
 
 void CFileLook::OnLbnSelchangeList1()
 {
-	// TODO: 在此添加控件通知处理程序代码
-
 	CRect rect;
 	GetDlgItem(IDC_STATIC_PIC)->GetClientRect(&rect);  // 获取图片控件矩形框
 	InvalidateRect(&rect);
@@ -126,8 +111,7 @@ void CFileLook::Reflesh()
 }
 void CFileLook::OnPaint()
 {
-	CPaintDC dc(this); // device context for painting
-					   // TODO: 在此处添加消息处理程序代码
+	CPaintDC dc(this);
 
 	index = m_list.GetCurSel();
 	if (index >= 0)

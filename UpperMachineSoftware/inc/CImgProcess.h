@@ -52,7 +52,7 @@ public:
 	void MainDlgDropFiles(const std::vector<CString>& main_dlg_drops_files);
 	virtual ~CSmartCarCam();
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_SMARTCARCAM };
+	enum { IDD = IDD_IMGPROCESS };
 #endif
 
 protected:

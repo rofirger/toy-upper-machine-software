@@ -31,7 +31,7 @@ public:
 
 	// 对话框数据
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_CAM_UART };
+	enum { IDD = IDD_UART };
 #endif
 
 protected:

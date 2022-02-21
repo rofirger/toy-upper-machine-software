@@ -32,7 +32,7 @@ public:
 
 	// 对话框数据
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_CAM_NET_SERVER };
+	enum { IDD = IDD_NET_SERVER };
 #endif
 
 protected:
