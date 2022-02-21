@@ -2,7 +2,7 @@
 #ifndef SERIALPORT_H_
 #define SERIALPORT_H_
 #include <Windows.h>
-class SimpleInfo;
+class CSimpleInfo;
 typedef enum ReponseType
 {
 	CSMARTCARCAM,
@@ -160,14 +160,14 @@ private:
 	CRITICAL_SECTION   m_csCommunicationSync;       //!< »¥³â²Ù×÷´®¿Ú
 
 	ReponseType response_type;
-	SimpleInfo* ptr_simpleinfo;
+	CSimpleInfo* ptr_simpleinfo;
 	SimpleinfoFormat simpleinfo_format;
 public:
 	void Restart();
 	void SetReponseType(ReponseType param);
 	ReponseType GetReponseType();
-	void SetSimpleinfoPtr(SimpleInfo* param);
-	SimpleInfo* GetSimpleinfoPtr();
+	void SetSimpleinfoPtr(CSimpleInfo* param);
+	CSimpleInfo* GetSimpleinfoPtr();
 	void SetSimpleinfoFormat(SimpleinfoFormat param);
 	SimpleinfoFormat GetSimpleinfoFormat();
 };

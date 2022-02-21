@@ -9,7 +9,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <functional>
-#define ROFIRGER_LOG_RELEASE 1
+#define ROFIRGER_LOG_DEBUG 1
 namespace rofirger
 {
 	typedef enum LOG_LEVEL

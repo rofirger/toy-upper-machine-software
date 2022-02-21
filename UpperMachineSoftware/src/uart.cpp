@@ -491,12 +491,12 @@ ReponseType CSerialPort::GetReponseType()
 	return response_type;
 }
 
-void CSerialPort::SetSimpleinfoPtr(SimpleInfo* param)
+void CSerialPort::SetSimpleinfoPtr(CSimpleInfo* param)
 {
 	ptr_simpleinfo = param;
 }
 
-SimpleInfo* CSerialPort::GetSimpleinfoPtr()
+CSimpleInfo* CSerialPort::GetSimpleinfoPtr()
 {
 	return ptr_simpleinfo;
 }

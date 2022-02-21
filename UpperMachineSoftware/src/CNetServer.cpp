@@ -5,27 +5,6 @@
 bool is_end_data_ac_func_net_server = false;
 IMPLEMENT_DYNAMIC(CNetServer, CDialogEx)
 #pragma   warning(disable:4996)
-//CNetServer::CNetServer(void* forms_csmc,
-//	void(*enable_control_csmc)(void* ptr_param_cscc, bool true_or_false),
-//	std::queue<QueueCacheDataType>& data_queue, size_t data_queue_ele_default_size,
-//	void (*_data_pro_thread_func)(void*), void* _data_pro_thread_func_param,
-//	void(*_update_data_func)(void*), void* _update_data_funcc_param,
-//	void(*_clear_data_func)(void*), void* _clear_data_func_param) :data_queue_cache(data_queue)
-//{
-//	CSmartCam = forms_csmc;
-//	EnableControl = enable_control_csmc;
-//	data_queue_cache_ele_default_size = data_queue_ele_default_size;
-//	DataProcessFunc = _data_pro_thread_func;
-//	data_process_func_param = _data_pro_thread_func_param;
-//	UpdateParentFormData = _update_data_func;
-//	update_parent_form_data_param = _update_data_funcc_param;
-//	ClearParentFormData = _clear_data_func;
-//	clear_data_func_param = _clear_data_func_param;
-//	process_func_param.forms = this;
-//	process_func_param.data_process_func_param = CSmartCam;
-//	handle_client = nullptr;
-//	handle_data_process = nullptr;
-//}
 CNetServer::CNetServer(DataSrcParam& data_src_param) :_data_src_param(data_src_param),
 data_queue_cache(data_src_param.GetDataQueue()),
 data_queue_cache_ele_default_size(data_src_param.GetDataQueueDefaultEleSize())
@@ -85,14 +64,12 @@ BOOL CNetServer::OnInitDialog()
 
 void CNetServer::OnBnClickedMainButton()
 {
-	//UpdateParentFormData(update_parent_form_data_param);
 	((void(*)(void*))(_data_src_param.GetPtrFuncUpdateData()))(_data_src_param.GetPtrFuncUpdateDataParam());
 	CString button_text;
 	GetDlgItemText(IDC_MAIN_BUTTON, button_text);
 	if (button_text == CString("监听"))
 	{
 		SetDlgItemText(IDC_MAIN_BUTTON, CString("停止"));
-		//EnableControl(CSmartCam, false);
 		((void(*)(void*, bool))(_data_src_param.GetPtrFuncEnableControl()))(_data_src_param.GetPtrFuncEnableControlParam(), false);
 		if (!sock.Create(port, SOCK_STREAM, (char*)ip.c_str()))
 		{
@@ -100,7 +77,6 @@ void CNetServer::OnBnClickedMainButton()
 			temp_fail.Format(_T("创建失败:%d"), GetLastError());
 			MessageBox(temp_fail, _T("提示"), 0);
 			SetDlgItemText(IDC_MAIN_BUTTON, _T("监听"));
-			//EnableControl(CSmartCam, true);
 			((void(*)(void*, bool))(_data_src_param.GetPtrFuncEnableControl()))(_data_src_param.GetPtrFuncEnableControlParam(), true);
 			return;
 		}
@@ -138,10 +114,8 @@ void CNetServer::OnBnClickedMainButton()
 		ProcessSoureDataFuncParam* process_pic_func_temp = reinterpret_cast<ProcessSoureDataFuncParam*>(_data_src_param.GetPtrFuncDataProThreadParam());
 		process_pic_func_temp->is_stop = true;
 		SetDlgItemText(IDC_MAIN_BUTTON, CString("监听"));
-		//EnableControl(CSmartCam, true);
 		((void(*)(void*, bool))(_data_src_param.GetPtrFuncEnableControl()))(_data_src_param.GetPtrFuncEnableControlParam(), true);
 		// 清理数据
-		//ClearParentFormData(clear_data_func_param);
 		((void(*)(void*))(_data_src_param.GetPtrFuncClearData()))(_data_src_param.GetPtrFuncClearDataParam());
 	}
 }

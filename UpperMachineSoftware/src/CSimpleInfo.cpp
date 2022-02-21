@@ -10,20 +10,20 @@
 
 std::string receive_data;
 
-IMPLEMENT_DYNAMIC(SimpleInfo, CDialogEx)
+IMPLEMENT_DYNAMIC(CSimpleInfo, CDialogEx)
 
-SimpleInfo::SimpleInfo(CWnd* pParent /*=nullptr*/)
+CSimpleInfo::CSimpleInfo(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SIMPLEINFO, pParent),
 	data_src_param(this, &process_pic_func_param, this, this, EnableSimpleInfoControlForDataSrc, ProcessSimpleInfoData, UpdateSimpleInfoData, ClearSimpleInfoDate, true, _data_queue, raw_data_ele_size),
 	forms_cam_uart(data_src_param), forms_cam_net_server(data_src_param), forms_cam_net_client(data_src_param)
 {
 }
 
-SimpleInfo::~SimpleInfo()
+CSimpleInfo::~CSimpleInfo()
 {
 }
 
-void SimpleInfo::DoDataExchange(CDataExchange* pDX)
+void CSimpleInfo::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO6, m_combo_format);
@@ -32,22 +32,23 @@ void SimpleInfo::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TAB_MODE, m_tab_mode);
 }
 
-BEGIN_MESSAGE_MAP(SimpleInfo, CDialogEx)
-	ON_BN_CLICKED(IDC_SENDFILE, &SimpleInfo::OnBnClickedSendfile)
-	ON_BN_CLICKED(IDC_BUTTON1, &SimpleInfo::OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON_SEND, &SimpleInfo::OnBnClickedButtonSend)
+BEGIN_MESSAGE_MAP(CSimpleInfo, CDialogEx)
+	ON_BN_CLICKED(IDC_SENDFILE, &CSimpleInfo::OnBnClickedSendfile)
+	ON_BN_CLICKED(IDC_BUTTON_CLEAR_RECEIVE_EDITOR, &CSimpleInfo::OnBnClickedButtonClearReceiveEditor)
+	ON_BN_CLICKED(IDC_BUTTON_SEND, &CSimpleInfo::OnBnClickedButtonSend)
 	ON_WM_SIZE()
-	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MODE, &SimpleInfo::OnTcnSelchangeTabMode)
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MODE, &CSimpleInfo::OnTcnSelchangeTabMode)
 END_MESSAGE_MAP()
 
-// SimpleInfo 消息处理程序
+// CSimpleInfo 消息处理程序
 
-void SimpleInfo::OnBnClickedSendfile()
+void CSimpleInfo::OnBnClickedSendfile()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	int nState = ((CButton*)GetDlgItem(IDC_SENDFILE))->GetCheck();
 	if (nState == BST_CHECKED)
 	{
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "choose msg file stream");
 		//选中
 		BOOL isOpen = FALSE;		//是否打开(否则为保存)
 		CString defaultDir = L"..//";	//默认打开的文件路径
@@ -68,12 +69,12 @@ void SimpleInfo::OnBnClickedSendfile()
 			CWnd::SetDlgItemTextW(IDC_PATH, _T("C://out.txt"));
 			path = "C://out.txt";
 		}
-		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "select the file{%ls} to save 'simple' bytes", path.GetBuffer());
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "select the file{%ls} to save msg bytes", path.GetBuffer());
 		path.ReleaseBuffer();
 	}
 }
 
-BOOL SimpleInfo::OnInitDialog()
+BOOL CSimpleInfo::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	// 设置tab
@@ -100,7 +101,7 @@ BOOL SimpleInfo::OnInitDialog()
 	return TRUE;
 }
 
-void CountBytes(SimpleInfo* ptr)
+void CountBytes(CSimpleInfo* ptr)
 {
 	size_t now_count = 0;
 	switch (ptr->m_combo_format.GetCurSel())
@@ -130,14 +131,14 @@ void CountBytes(SimpleInfo* ptr)
 
 }
 
-void RefleshBuff(SimpleInfo* ptr)
+void RefleshBuff(CSimpleInfo* ptr)
 {
 	ptr->SetDlgItemTextW(IDC_EDIT1, CString(receive_data.c_str()));
 	ptr->m_edit_receive.LineScroll(ptr->m_edit_receive.GetLineCount() - 1, 0);
 	CountBytes(ptr);
 }
 
-void SimpleInfo::OnBnClickedButton1()
+void CSimpleInfo::OnBnClickedButtonClearReceiveEditor()
 {
 	// 输出到文件
 	int sendfile_status = ((CButton*)GetDlgItem(IDC_SENDFILE))->GetCheck();
@@ -163,24 +164,32 @@ void SimpleInfo::OnBnClickedButton1()
 	SetDlgItemTextW(IDC_EDIT1, CString(""));
 }
 
-void SimpleInfo::OnBnClickedButtonSend()
+void CSimpleInfo::OnBnClickedButtonSend()
 {
 	CString send_str;
 	GetDlgItemTextW(IDC_EDIT_SEND, send_str);
-	int length_data = send_str.GetLength();
-	unsigned char* send_data = new unsigned char[length_data + 1];
-	LPWSTR s_s = send_str.GetBuffer();
-	for (int i = 0; i < length_data; ++i)
-	{
-		send_data[i] = s_s[i];
-	}
+	std::string send_data(CW2A(send_str.GetBuffer()));
 	send_str.ReleaseBuffer();
-	send_data[length_data] = '\0';
-	mySerialPort.WriteData(send_data, length_data);
-	rofirger::add_log(rofirger::LOG_LEVEL_INFO, "send {%s} with %d bytes to serial port", send_data, length_data);
+	int num = m_tab_mode.GetCurSel();//获取点击了哪一个页面
+	switch (num)
+	{
+	case 0:
+		mySerialPort.WriteData((unsigned char*)send_data.c_str(), send_data.length());
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "send {%s} with %d bytes to serial port", send_data.c_str(), send_data.length());
+		break;
+	case 1:
+		forms_cam_net_server.socka.Send(send_data.c_str(), send_data.length());
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "send {%s} with %d bytes to net client", send_data.c_str(), send_data.length());
+		break;
+	case 2:
+		forms_cam_net_client.sock.Send(send_data.c_str(), send_data.length());
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "send {%s} with %d bytes to net server", send_data.c_str(), send_data.length());
+		break;
+	}
+
 }
 
-void SimpleInfo::OnSize(UINT nType, int cx, int cy)
+void CSimpleInfo::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 	// tab
@@ -209,7 +218,7 @@ void SimpleInfo::OnSize(UINT nType, int cx, int cy)
 	CWnd* pWnd_format = GetDlgItem(IDC_COMBO6);
 	CWnd* pWnd_sendfile = GetDlgItem(IDC_SENDFILE);
 	CWnd* pWnd_path = GetDlgItem(IDC_PATH);
-	CWnd* pWnd_clear = GetDlgItem(IDC_BUTTON1);
+	CWnd* pWnd_clear = GetDlgItem(IDC_BUTTON_CLEAR_RECEIVE_EDITOR);
 	CWnd* pWnd_static_receive = GetDlgItem(IDC_STATIC_RECEIVE);
 	CWnd* pWnd_static_send = GetDlgItem(IDC_STATIC_SEND);
 	CWnd* pWnd_receiveinfo = GetDlgItem(IDC_receiveinfo);
@@ -363,13 +372,13 @@ string UcharsToBinary(unsigned char* num, size_t s_)
 }
 void EnableSimpleInfoControlForDataSrc(void* ptr_param_simple_info, bool true_or_false)
 {
-	SimpleInfo* ptr = reinterpret_cast<SimpleInfo*>(ptr_param_simple_info);
+	CSimpleInfo* ptr = reinterpret_cast<CSimpleInfo*>(ptr_param_simple_info);
 	ptr->GetDlgItem(IDC_SENDFILE)->EnableWindow(true_or_false);
 	ptr->GetDlgItem(IDC_PATH)->EnableWindow(true_or_false);
 }
 void ProcessSimpleInfoData(void* ptr_param)
 {
-	SimpleInfo* ptr = reinterpret_cast<SimpleInfo*>(reinterpret_cast<ProcessSoureDataFuncParam*>(ptr_param)->form);
+	CSimpleInfo* ptr = reinterpret_cast<CSimpleInfo*>(reinterpret_cast<ProcessSoureDataFuncParam*>(ptr_param)->form);
 	bool& is_stop_this_func = reinterpret_cast<ProcessSoureDataFuncParam*>(ptr_param)->is_stop;
 	SimpleinfoFormat format_ = (SimpleinfoFormat)ptr->m_combo_format.GetCurSel();
 
@@ -442,7 +451,7 @@ void UpdateSimpleInfoData(void* ptr_param)
 {}
 void ClearSimpleInfoDate(void* ptr_param)
 {
-	SimpleInfo* ptr = reinterpret_cast<SimpleInfo*>(ptr_param);
+	CSimpleInfo* ptr = reinterpret_cast<CSimpleInfo*>(ptr_param);
 	while (!ptr->_data_queue.empty())
 	{
 		ptr->_data_queue.front()->Release();
@@ -451,7 +460,7 @@ void ClearSimpleInfoDate(void* ptr_param)
 	}
 }
 
-void SimpleInfo::OnTcnSelchangeTabMode(NMHDR* pNMHDR, LRESULT* pResult)
+void CSimpleInfo::OnTcnSelchangeTabMode(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	int num = m_tab_mode.GetCurSel();//获取点击了哪一个页面
 	switch (num)

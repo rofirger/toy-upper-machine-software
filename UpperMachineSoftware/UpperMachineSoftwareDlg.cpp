@@ -133,6 +133,7 @@ void CUpperMachineSoftwareDlg::CheckVer()
 			rofirger::add_log(rofirger::LOG_LEVEL_ERROR, "This computer is missing update.exe");
 			::MessageBox(NULL, _T("程序目录下缺少升级程序update.exe, 请联系作者QQ: 842474373. 或访问文件直链 http://rofirger.xyz/update.exe"), _T("提示"), 0);
 		}
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "exit this process for updating");
 		//关闭本程序
 		ExitProcess(0);
 	}

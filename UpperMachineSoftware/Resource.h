@@ -1,18 +1,18 @@
 ﻿//{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ 生成的包含文件。
-// 供 UARTDisplay.rc 使用
+// 供 UpperMachineSoftware.rc 使用
 //
-#define IDD_UPPERMACHINE_DIALOG          102
+#define IDD_UPPERMACHINE_DIALOG         102
 #define IDR_MAINFRAME                   128
-#define IDD_IMGPROCESS                 130
+#define IDD_IMGPROCESS                  130
 #define IDD_SIMPLEINFO                  132
 #define IDD_PID                         134
 #define IDD_PIXEL_SRC                   136
 #define IDD_FILE_LOOK                   138
 #define IDD_VEER                        144
-#define IDD_UART                    146
-#define IDD_NET_SERVER              150
-#define IDD_NET_CLIENT              152
+#define IDD_UART                        146
+#define IDD_NET_SERVER                  150
+#define IDD_NET_CLIENT                  152
 #define IDD_DIALOG_NET_SERVER_WAIT      154
 #define IDC_TAB1                        1000
 #define IDC_COMBO1                      1004
@@ -131,6 +131,7 @@
 #define IDC_STATIC_MAX_CONTACT          1137
 #define IDC_STATIC_RECEIVE_PICS         1138
 #define IDC_BUTTON_SEND                 1139
+#define IDC_BUTTON_CLEAR_RECEIVE_EDITOR 1140
 
 // Next default values for new objects
 // 
@@ -138,7 +139,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        156
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1140
+#define _APS_NEXT_CONTROL_VALUE         1141
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif

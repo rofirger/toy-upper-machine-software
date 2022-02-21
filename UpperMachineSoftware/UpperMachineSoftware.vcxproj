@@ -306,6 +306,7 @@
     <None Include="res\UpperMachineSoftware.rc2" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\icon.ico" />
     <Image Include="res\UpperMachineSoftware.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

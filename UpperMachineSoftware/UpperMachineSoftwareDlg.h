@@ -29,7 +29,7 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 private:
-	SimpleInfo uart_simple;
+	CSimpleInfo uart_simple;
 	CSmartCarCam uart_pic;
 	CRTwaveform uart_rtwaveform;
 	std::vector<CString> main_dlg_drop_files;

@@ -134,13 +134,13 @@ public:
 		free(_array);
 	}
 };
-class SimpleInfo : public CDialogEx
+class CSimpleInfo : public CDialogEx
 {
-	DECLARE_DYNAMIC(SimpleInfo)
+	DECLARE_DYNAMIC(CSimpleInfo)
 
 public:
-	SimpleInfo(CWnd* pParent = nullptr);   // 标准构造函数
-	virtual ~SimpleInfo();
+	CSimpleInfo(CWnd* pParent = nullptr);   // 标准构造函数
+	virtual ~CSimpleInfo();
 
 	// 对话框数据
 #ifdef AFX_DESIGN_TIME
@@ -192,7 +192,7 @@ public:
 	CButton m_check_tofile;
 	volatile bool IS_STOP_RECONNECT = false;
 	CEdit m_edit_receive;
-	afx_msg void OnBnClickedButton1();
+	afx_msg void OnBnClickedButtonClearReceiveEditor();
 	afx_msg void OnBnClickedButtonSend();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 private:
