@@ -30,7 +30,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	CSimpleInfo uart_simple;
-	CSmartCarCam uart_pic;
+	CImgProcess uart_pic;
 	CRTwaveform uart_rtwaveform;
 	std::vector<CString> main_dlg_drop_files;
 public:

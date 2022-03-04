@@ -25,20 +25,20 @@
 
 using namespace cv;
 
-IMPLEMENT_DYNAMIC(CSmartCarCam, CDialogEx)
+IMPLEMENT_DYNAMIC(CImgProcess, CDialogEx)
 
-CSmartCarCam::CSmartCarCam(CWnd* pParent)
+CImgProcess::CImgProcess(CWnd* pParent)
 	: CDialogEx(IDD_IMGPROCESS, pParent),
 	data_src_param(this, &process_pic_func_param, this, this, EnableControlForDataSrc, PicDataProcess, UpdateCSCCData, ClearCSCCDate, true, raw_pic_data, raw_pic_data_ele_size),
 	forms_cam_uart(data_src_param), forms_cam_net_server(data_src_param), forms_cam_net_client(data_src_param)
 {
 }
 
-CSmartCarCam::~CSmartCarCam()
+CImgProcess::~CImgProcess()
 {
 	delete file_look;
 }
-void CSmartCarCam::MainDlgDropFiles(const std::vector<CString>& main_dlg_drops_files)
+void CImgProcess::MainDlgDropFiles(const std::vector<CString>& main_dlg_drops_files)
 {
 	for (int i = 0; i < main_dlg_drops_files.size(); ++i)
 	{
@@ -46,7 +46,7 @@ void CSmartCarCam::MainDlgDropFiles(const std::vector<CString>& main_dlg_drops_f
 	}
 }
 
-void CSmartCarCam::DoDataExchange(CDataExchange* pDX)
+void CImgProcess::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO6, m_combo_pictype);
@@ -67,32 +67,32 @@ void CSmartCarCam::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_TAB_MODE, m_tab_mode);
 }
 
-BEGIN_MESSAGE_MAP(CSmartCarCam, CDialogEx)
+BEGIN_MESSAGE_MAP(CImgProcess, CDialogEx)
 	ON_WM_MOUSEMOVE()
 	ON_WM_LBUTTONDOWN()
-	ON_NOTIFY(NM_CLICK, IDC_LIST2, &CSmartCarCam::OnNMClickList2)
+	ON_NOTIFY(NM_CLICK, IDC_LIST2, &CImgProcess::OnNMClickList2)
 	ON_WM_HSCROLL()
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER2, &CSmartCarCam::OnNMCustomdrawSlider2)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER1, &CSmartCarCam::OnNMCustomdrawSlider1)
-	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER3, &CSmartCarCam::OnNMCustomdrawSlider3)
-	ON_BN_CLICKED(IDC_SAVE_RAW, &CSmartCarCam::OnBnClickedSaveRaw)
-	ON_BN_CLICKED(IDC_SAVE_PROCESS, &CSmartCarCam::OnBnClickedSaveProcess)
-	ON_BN_CLICKED(IDC_BUTTON1, &CSmartCarCam::OnBnClickedButton1)
-	ON_BN_CLICKED(IDC_BUTTON2, &CSmartCarCam::OnBnClickedButton2)
-	ON_BN_CLICKED(IDC_BUTTON7, &CSmartCarCam::OnBnClickedButton7)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER2, &CImgProcess::OnNMCustomdrawSlider2)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER1, &CImgProcess::OnNMCustomdrawSlider1)
+	ON_NOTIFY(NM_CUSTOMDRAW, IDC_SLIDER3, &CImgProcess::OnNMCustomdrawSliderPerspective)
+	ON_BN_CLICKED(IDC_SAVE_RAW, &CImgProcess::OnBnClickedSaveRaw)
+	ON_BN_CLICKED(IDC_SAVE_PROCESS, &CImgProcess::OnBnClickedSaveProcess)
+	ON_BN_CLICKED(IDC_BUTTON1, &CImgProcess::OnBnClickedButton1)
+	ON_BN_CLICKED(IDC_BUTTON2, &CImgProcess::OnBnClickedButton2)
+	ON_BN_CLICKED(IDC_BUTTON7, &CImgProcess::OnBnClickedButton7)
 	ON_WM_DROPFILES()
-	ON_BN_CLICKED(IDC_BUTTON8, &CSmartCarCam::OnBnClickedButton8)
+	ON_BN_CLICKED(IDC_BUTTON8, &CImgProcess::OnBnClickedButton8)
 	ON_WM_PAINT()
 	ON_WM_SIZE()
-	ON_BN_CLICKED(IDC_BUTTON_VEER, &CSmartCarCam::OnBnClickedButtonVeer)
+	ON_BN_CLICKED(IDC_BUTTON_VEER, &CImgProcess::OnBnClickedButtonVeer)
 	ON_WM_MOUSEWHEEL()
-	ON_BN_CLICKED(IDC_BUTTON_SINGLE_STEP_RIGHT, &CSmartCarCam::OnBnClickedButtonSingleStepRight)
-	ON_BN_CLICKED(IDC_BUTTON_SINGLE_STEP_LEFT, &CSmartCarCam::OnBnClickedButtonSingleStepLeft)
-	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MODE, &CSmartCarCam::OnTcnSelchangeTabMode)
+	ON_BN_CLICKED(IDC_BUTTON_SINGLE_STEP_RIGHT, &CImgProcess::OnBnClickedButtonSingleStepRight)
+	ON_BN_CLICKED(IDC_BUTTON_SINGLE_STEP_LEFT, &CImgProcess::OnBnClickedButtonSingleStepLeft)
+	ON_NOTIFY(TCN_SELCHANGE, IDC_TAB_MODE, &CImgProcess::OnTcnSelchangeTabMode)
 END_MESSAGE_MAP()
 
 // 获取文件夹下的所有文件
-void CSmartCarCam::GetFileFromDirectory(CString csDirPath, std::vector<CString>& vctPath)
+void CImgProcess::GetFileFromDirectory(CString csDirPath, std::vector<CString>& vctPath)
 {
 	csDirPath += "*.sfp";
 	HANDLE file;
@@ -108,7 +108,7 @@ void CSmartCarCam::GetFileFromDirectory(CString csDirPath, std::vector<CString>&
 	}
 	csDirPath.ReleaseBuffer();
 }
-void CSmartCarCam::ReadPixelSelectedFile(std::string file_name, std::vector<CString>& vec)
+void CImgProcess::ReadPixelSelectedFile(std::string file_name, std::vector<CString>& vec)
 {
 	std::fstream  f(file_name);
 	std::string file_data;
@@ -118,7 +118,7 @@ void CSmartCarCam::ReadPixelSelectedFile(std::string file_name, std::vector<CStr
 	}
 }
 
-void CSmartCarCam::WriteOperationInfoToFile()
+void CImgProcess::WriteOperationInfoToFile()
 {
 	std::fstream write_file;
 	write_file.open("data_", std::ios::out | std::ios::binary);
@@ -203,7 +203,7 @@ void CSmartCarCam::WriteOperationInfoToFile()
 	WriteStringToFile("pixel_folder_path.dat", pixel_src_path_temp_str);
 }
 
-void CSmartCarCam::ReadOperationInfoFromFile()
+void CImgProcess::ReadOperationInfoFromFile()
 {
 	std::fstream read_file;
 	read_file.open("data_", std::ios::in | std::ios::binary);
@@ -273,7 +273,7 @@ void CSmartCarCam::ReadOperationInfoFromFile()
 	ReadPixelSelectedFile("pixel_file_selected.dat", pixel_src_file_path_selected);
 }
 
-BOOL CSmartCarCam::OnInitDialog()
+BOOL CImgProcess::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 	// 设置tab
@@ -396,7 +396,7 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 //void RefleshPic(void* ptr_param)
 {
 	RefreshPicFuncParam* ptr_param = reinterpret_cast<RefreshPicFuncParam*>(lpParam);
-	CSmartCarCam* ptr = reinterpret_cast<CSmartCarCam*>(ptr_param->form);
+	CImgProcess* ptr = reinterpret_cast<CImgProcess*>(ptr_param->form);
 	ptr->num_receive_pics = 0;
 	while (!ptr_param->is_stop)
 	{
@@ -862,22 +862,25 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 		{
 			delete[]ptr->left_line;
 			ptr->left_line = NULL;
+			ptr->perspective_left_line.clear();
 		}
 		if (ptr->mid_line != NULL)
 		{
 			delete[]ptr->mid_line;
 			ptr->mid_line = NULL;
+			ptr->perspective_mid_line.clear();
 		}
 		if (ptr->right_line != NULL)
 		{
 			delete[]ptr->right_line;
 			ptr->right_line = NULL;
+			ptr->perspective_right_line.clear();
 		}
 	}
 	return 0;
 }
 // 像素源
-void RefleshPicPixel(CSmartCarCam* ptr)
+void RefleshPicPixel(CImgProcess* ptr)
 {
 	if (ptr->is_start_pixel_src || ptr->is_single_step_pixel_src)
 	{
@@ -1177,23 +1180,53 @@ void RefleshPicPixel(CSmartCarCam* ptr)
 		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "using left_line, mid_line and right_line arrays");
 		if (is_show_left_line && ptr->left_line != NULL)
 		{
-			for (int i = 0; i < img_process.rows; ++i)
+			if (ptr->perspective_left_line.size() != 0)
 			{
-				img_process.at<uchar>(i, ptr->left_line[i]) = 0;
+				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				{
+					img_process.at<uchar>(ptr->perspective_left_line[i].y, ptr->perspective_left_line[i].x) = 0;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				{
+					img_process.at<uchar>(i, ptr->left_line[i]) = 0;
+				}
 			}
 		}
 		if (is_show_mid_line && ptr->mid_line != NULL)
 		{
-			for (int i = 0; i < img_process.rows; ++i)
+			if (ptr->perspective_mid_line.size() != 0)
 			{
-				img_process.at<uchar>(i, ptr->mid_line[i]) = 0;
+				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				{
+					img_process.at<uchar>(ptr->perspective_mid_line[i].y, ptr->perspective_mid_line[i].x) = 0;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				{
+					img_process.at<uchar>(i, ptr->mid_line[i]) = 0;
+				}
 			}
 		}
 		if (is_show_right_line && ptr->right_line != NULL)
 		{
-			for (int i = 0; i < img_process.rows; ++i)
+			if (ptr->perspective_right_line.size() != 0)
 			{
-				img_process.at<uchar>(i, ptr->right_line[i]) = 0;
+				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				{
+					img_process.at<uchar>(ptr->perspective_right_line[i].y, ptr->perspective_right_line[i].x) = 0;
+				}
+			}
+			else
+			{
+				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				{
+					img_process.at<uchar>(i, ptr->right_line[i]) = 0;
+				}
 			}
 		}
 
@@ -1356,16 +1389,19 @@ void RefleshPicPixel(CSmartCarCam* ptr)
 		{
 			delete[]ptr->left_line;
 			ptr->left_line = NULL;
+			ptr->perspective_left_line.clear();
 		}
 		if (ptr->mid_line != NULL)
 		{
 			delete[]ptr->mid_line;
 			ptr->mid_line = NULL;
+			ptr->perspective_mid_line.clear();
 		}
 		if (ptr->right_line != NULL)
 		{
 			delete[]ptr->right_line;
 			ptr->right_line = NULL;
+			ptr->perspective_right_line.clear();
 		}
 		if (ptr->is_single_step_pixel_src == false)
 		{
@@ -1385,7 +1421,7 @@ void RefleshPicPixel(CSmartCarCam* ptr)
 	}
 }
 
-cv::Mat& CSmartCarCam::GetPerspectiveTransformMat()
+cv::Mat& CImgProcess::GetPerspectiveTransformMat()
 {
 	CString str_x_1;
 	CString str_y_1;
@@ -1437,7 +1473,7 @@ cv::Mat& CSmartCarCam::GetPerspectiveTransformMat()
 }
 void EnableControlForDataSrc(void* ptr_param_cscc, bool true_or_false)
 {
-	CSmartCarCam* ptr = reinterpret_cast<CSmartCarCam*>(ptr_param_cscc);
+	CImgProcess* ptr = reinterpret_cast<CImgProcess*>(ptr_param_cscc);
 	ptr->GetDlgItem(IDC_X_1)->EnableWindow(true_or_false);
 	ptr->GetDlgItem(IDC_X_2)->EnableWindow(true_or_false);
 	ptr->GetDlgItem(IDC_X_3)->EnableWindow(true_or_false);
@@ -1470,7 +1506,7 @@ void EnableControlForDataSrc(void* ptr_param_cscc, bool true_or_false)
 }
 void EnableControlForPixelSrc(void* ptr_param_cscc, bool true_or_false)
 {
-	CSmartCarCam* ptr = reinterpret_cast<CSmartCarCam*>(ptr_param_cscc);
+	CImgProcess* ptr = reinterpret_cast<CImgProcess*>(ptr_param_cscc);
 	ptr->GetDlgItem(IDC_X_1)->EnableWindow(true_or_false);
 	ptr->GetDlgItem(IDC_X_2)->EnableWindow(true_or_false);
 	ptr->GetDlgItem(IDC_X_3)->EnableWindow(true_or_false);
@@ -1501,7 +1537,7 @@ void EnableControlForPixelSrc(void* ptr_param_cscc, bool true_or_false)
 	ptr->GetDlgItem(IDC_BUTTON_SINGLE_STEP_RIGHT)->EnableWindow(true_or_false);
 }
 
-void CSmartCarCam::OnMouseMove(UINT nFlags, CPoint point)
+void CImgProcess::OnMouseMove(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	CRect rect_raw;
@@ -1582,7 +1618,7 @@ void CSmartCarCam::OnMouseMove(UINT nFlags, CPoint point)
 	CDialogEx::OnMouseMove(nFlags, point);
 }
 
-void CSmartCarCam::OnLButtonDown(UINT nFlags, CPoint point)
+void CImgProcess::OnLButtonDown(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 
@@ -1701,7 +1737,7 @@ void CSmartCarCam::OnLButtonDown(UINT nFlags, CPoint point)
 	CDialogEx::OnLButtonDown(nFlags, point);
 }
 
-BOOL CSmartCarCam::PreTranslateMessage(MSG* pMsg)
+BOOL CImgProcess::PreTranslateMessage(MSG* pMsg)
 {
 	switch (pMsg->message)
 	{
@@ -1719,7 +1755,7 @@ BOOL CSmartCarCam::PreTranslateMessage(MSG* pMsg)
 }
 
 // 二值化
-unsigned char** CSmartCarCam::InternalBinaryProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param)
+unsigned char** CImgProcess::InternalBinaryProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param)
 {
 	try
 	{
@@ -1743,7 +1779,7 @@ unsigned char** CSmartCarCam::InternalBinaryProcess(unsigned char** pixel_mat_pa
 	return pixel_mat_param;
 }
 
-unsigned char** CSmartCarCam::InternalAuxiliaryProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param)
+unsigned char** CImgProcess::InternalAuxiliaryProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param)
 {
 	try
 	{
@@ -1773,7 +1809,7 @@ unsigned char** CSmartCarCam::InternalAuxiliaryProcess(unsigned char** pixel_mat
 	return pixel_mat_param;
 }
 
-unsigned char** CSmartCarCam::InternalPerspectiveProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param, int max_zoom_val_param)
+unsigned char** CImgProcess::InternalPerspectiveProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param, int max_zoom_val_param)
 {
 	try
 	{
@@ -1801,6 +1837,52 @@ unsigned char** CSmartCarCam::InternalPerspectiveProcess(unsigned char** pixel_m
 
 		unsigned char** dst_img_mat = PerspectiveTransformProcess(pixel_mat_param, old_rows, old_cols, dst_rows, dst_cols, transform_mat);
 		cv::resize(img_process_param, img_process_param, Size(dst_cols, dst_rows));
+		/* 若存在辅助线，一并逆透视处理 */
+		if (left_line != NULL && mid_line != NULL && right_line != NULL)
+		{
+			perspective_left_line.resize(old_rows);
+			perspective_mid_line.resize(old_rows);
+			perspective_right_line.resize(old_rows);
+			for (size_t i_ = 0; i_ < old_rows; ++i_)
+			{
+				double x, y, w;
+				x = transform_mat[0][0] * left_line[i_] + transform_mat[0][1] * i_ + transform_mat[0][2];
+				y = transform_mat[1][0] * left_line[i_] + transform_mat[1][1] * i_ + transform_mat[1][2];
+				w = transform_mat[2][0] * left_line[i_] + transform_mat[2][1] * i_ + transform_mat[2][2];
+				int dst_col = (int)round(x / w);
+				int dst_row = (int)round(y / w);
+				if (dst_col >= 0 && dst_col < dst_cols
+					&& dst_row >= 0 && dst_row < dst_rows)
+				{
+					perspective_left_line[i_].x = dst_col;
+					perspective_left_line[i_].y = dst_row;
+				}
+
+				x = transform_mat[0][0] * mid_line[i_] + transform_mat[0][1] * i_ + transform_mat[0][2];
+				y = transform_mat[1][0] * mid_line[i_] + transform_mat[1][1] * i_ + transform_mat[1][2];
+				w = transform_mat[2][0] * mid_line[i_] + transform_mat[2][1] * i_ + transform_mat[2][2];
+				dst_col = (int)round(x / w);
+				dst_row = (int)round(y / w);
+				if (dst_col >= 0 && dst_col < dst_cols
+					&& dst_row >= 0 && dst_row < dst_rows)
+				{
+					perspective_mid_line[i_].x = dst_col;
+					perspective_mid_line[i_].y = dst_row;
+				}
+
+				x = transform_mat[0][0] * right_line[i_] + transform_mat[0][1] * i_ + transform_mat[0][2];
+				y = transform_mat[1][0] * right_line[i_] + transform_mat[1][1] * i_ + transform_mat[1][2];
+				w = transform_mat[2][0] * right_line[i_] + transform_mat[2][1] * i_ + transform_mat[2][2];
+				dst_col = (int)round(x / w);
+				dst_row = (int)round(y / w);
+				if (dst_col >= 0 && dst_col < dst_cols
+					&& dst_row >= 0 && dst_row < dst_rows)
+				{
+					perspective_right_line[i_].x = dst_col;
+					perspective_right_line[i_].y = dst_row;
+				}
+			}
+		}
 
 		for (int i = 0; i < dst_rows; ++i)
 		{
@@ -1844,7 +1926,7 @@ unsigned char** CSmartCarCam::InternalPerspectiveProcess(unsigned char** pixel_m
 
 	return pixel_mat_param;
 }
-UserProcessRet CSmartCarCam::InternalUserProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param, int max_zoom_val_param, bool& is_show_left_line, bool& is_show_mid_line, bool& is_show_right_line)
+UserProcessRet CImgProcess::InternalUserProcess(unsigned char** pixel_mat_param, cv::Mat& img_process_param, int max_zoom_val_param, bool& is_show_left_line, bool& is_show_mid_line, bool& is_show_right_line)
 {
 	try
 	{
@@ -2014,7 +2096,7 @@ UserProcessRet CSmartCarCam::InternalUserProcess(unsigned char** pixel_mat_param
 	}
 }
 
-void CSmartCarCam::OnNMClickList2(NMHDR* pNMHDR, LRESULT* pResult)
+void CImgProcess::OnNMClickList2(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMITEMACTIVATE pNMItemActivate = reinterpret_cast<LPNMITEMACTIVATE>(pNMHDR);
 	if (perspective_transform_mat.cols != 3 || perspective_transform_mat.rows != 3)
@@ -2049,7 +2131,7 @@ void CSmartCarCam::OnNMClickList2(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CSmartCarCam::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+void CImgProcess::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	CSliderCtrl* pSlider = (CSliderCtrl*)pScrollBar;
@@ -2061,7 +2143,7 @@ void CSmartCarCam::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 	CDialogEx::OnHScroll(nSBCode, nPos, pScrollBar);
 }
 
-void CSmartCarCam::OnNMCustomdrawSlider2(NMHDR* pNMHDR, LRESULT* pResult)
+void CImgProcess::OnNMCustomdrawSlider2(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
@@ -2072,17 +2154,18 @@ void CSmartCarCam::OnNMCustomdrawSlider2(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CSmartCarCam::OnNMCustomdrawSlider3(NMHDR* pNMHDR, LRESULT* pResult)
+void CImgProcess::OnNMCustomdrawSliderPerspective(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
 	CString str;
 	str.Format(_T("%d"), m_slider_zoom_perspective.GetPos());
 	m_toolTip.UpdateTipText(str, GetDlgItem(IDC_SLIDER3));
+	m_zoom_val_perspective = m_slider_zoom_perspective.GetPos();
 	*pResult = 0;
 }
 
-void CSmartCarCam::OnNMCustomdrawSlider1(NMHDR* pNMHDR, LRESULT* pResult)
+void CImgProcess::OnNMCustomdrawSlider1(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	LPNMCUSTOMDRAW pNMCD = reinterpret_cast<LPNMCUSTOMDRAW>(pNMHDR);
 	// TODO: 在此添加控件通知处理程序代码
@@ -2092,7 +2175,7 @@ void CSmartCarCam::OnNMCustomdrawSlider1(NMHDR* pNMHDR, LRESULT* pResult)
 	*pResult = 0;
 }
 
-void CSmartCarCam::OnBnClickedSaveRaw()
+void CImgProcess::OnBnClickedSaveRaw()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	int state = ((CButton*)GetDlgItem(IDC_SAVE_RAW))->GetCheck();
@@ -2124,7 +2207,7 @@ void CSmartCarCam::OnBnClickedSaveRaw()
 	}
 }
 
-void CSmartCarCam::OnBnClickedSaveProcess()
+void CImgProcess::OnBnClickedSaveProcess()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	int state = ((CButton*)GetDlgItem(IDC_SAVE_PROCESS))->GetCheck();
@@ -2156,7 +2239,7 @@ void CSmartCarCam::OnBnClickedSaveProcess()
 	}
 }
 
-void CSmartCarCam::OnPaint()
+void CImgProcess::OnPaint()
 {
 	CPaintDC dc(this);
 	// 原图像
@@ -2350,7 +2433,7 @@ void CDragListCtrl::OnLButtonUp(UINT nFlags, CPoint point)
 	CListCtrl::OnLButtonUp(nFlags, point);
 }
 
-void CSmartCarCam::OnBnClickedButton1()
+void CImgProcess::OnBnClickedButton1()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString img_("保存摄像头原图");
@@ -2368,14 +2451,14 @@ void CSmartCarCam::OnBnClickedButton1()
 	}
 }
 
-void CSmartCarCam::OnBnClickedButton2()
+void CImgProcess::OnBnClickedButton2()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CPixelSrc pixel_src_dlg(this);
 	pixel_src_dlg.DoModal();
 }
 
-void CSmartCarCam::OnDropFiles(HDROP hDropInfo)
+void CImgProcess::OnDropFiles(HDROP hDropInfo)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	int  nFileCount = ::DragQueryFile(hDropInfo, 0xFFFFFFFF, NULL, 256);   //获取拖入的文件数量
@@ -2405,7 +2488,7 @@ void CSmartCarCam::OnDropFiles(HDROP hDropInfo)
 	CDialogEx::OnDropFiles(hDropInfo);
 }
 
-void CSmartCarCam::OnBnClickedButton7()
+void CImgProcess::OnBnClickedButton7()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CString now_botton_text;
@@ -2450,7 +2533,7 @@ void CSmartCarCam::OnBnClickedButton7()
 		SetDlgItemTextW(IDC_PIXEL_SRC_PATH, _T(""));
 	}
 }
-void CSmartCarCam::GetPixelPicInfo()
+void CImgProcess::GetPixelPicInfo()
 {
 	for (int i = 0; i < pixel_src_file_path_selected.size(); ++i)
 	{
@@ -2476,12 +2559,12 @@ void CSmartCarCam::GetPixelPicInfo()
 	}
 }
 
-void CSmartCarCam::OnBnClickedButton8()
+void CImgProcess::OnBnClickedButton8()
 {
 	pixel_src_file_path_selected_index = 0;
 }
 
-void CSmartCarCam::OnSize(UINT nType, int cx, int cy)
+void CImgProcess::OnSize(UINT nType, int cx, int cy)
 {
 	CDialogEx::OnSize(nType, cx, cy);
 	// 配置
@@ -3116,7 +3199,7 @@ void CSmartCarCam::OnSize(UINT nType, int cx, int cy)
 	// 以上串口配置区域位置调整
 }
 
-void CSmartCarCam::OnBnClickedButtonVeer()
+void CImgProcess::OnBnClickedButtonVeer()
 {
 	if (veer_show_dlg != NULL)
 	{
@@ -3130,7 +3213,7 @@ void CSmartCarCam::OnBnClickedButtonVeer()
 	veer_show_dlg->ShowWindow(SW_SHOWNORMAL);
 }
 
-BOOL CSmartCarCam::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+BOOL CImgProcess::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	CRect rect_raw;
@@ -3291,7 +3374,7 @@ BOOL CSmartCarCam::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 }
 
 
-void CSmartCarCam::OnBnClickedButtonSingleStepLeft()
+void CImgProcess::OnBnClickedButtonSingleStepLeft()
 {
 	is_single_step_pixel_src = true;
 	// 求取透视变换矩阵
@@ -3331,7 +3414,7 @@ void CSmartCarCam::OnBnClickedButtonSingleStepLeft()
 }
 
 
-void CSmartCarCam::OnBnClickedButtonSingleStepRight()
+void CImgProcess::OnBnClickedButtonSingleStepRight()
 {
 	is_single_step_pixel_src = true;
 	// 求取透视变换矩阵
@@ -3370,7 +3453,7 @@ void CSmartCarCam::OnBnClickedButtonSingleStepRight()
 }
 
 
-void CSmartCarCam::OnTcnSelchangeTabMode(NMHDR* pNMHDR, LRESULT* pResult)
+void CImgProcess::OnTcnSelchangeTabMode(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	int num = m_tab_mode.GetCurSel();//获取点击了哪一个页面
 	switch (num)
@@ -3435,7 +3518,7 @@ void GetAllContent(const std::string& file_name, std::string& resstr)
 // 图像原始数据处理
 void PicDataProcess(void* ptr_param)
 {
-	CSmartCarCam* ptr = reinterpret_cast<CSmartCarCam*>(reinterpret_cast<ProcessSoureDataFuncParam*>(ptr_param)->form);
+	CImgProcess* ptr = reinterpret_cast<CImgProcess*>(reinterpret_cast<ProcessSoureDataFuncParam*>(ptr_param)->form);
 	bool& is_stop_this_func = reinterpret_cast<ProcessSoureDataFuncParam*>(ptr_param)->is_stop;
 	// 帧头0x01 0xFE，帧尾: 0xFE 0x01
 	char pic_head_chars[2] = { 0x01,0xFE };
@@ -3549,7 +3632,7 @@ void PicDataProcess(void* ptr_param)
 
 void UpdateCSCCData(void* ptr_param)
 {
-	CSmartCarCam* ptr = reinterpret_cast<CSmartCarCam*>(ptr_param);
+	CImgProcess* ptr = reinterpret_cast<CImgProcess*>(ptr_param);
 	// 更新软件输入文件信息
 	ptr->WriteOperationInfoToFile();
 	// 求取透视变换矩阵
@@ -3577,7 +3660,7 @@ void UpdateCSCCData(void* ptr_param)
 }
 void ClearCSCCDate(void* ptr_param)
 {
-	CSmartCarCam* ptr = reinterpret_cast<CSmartCarCam*>(ptr_param);
+	CImgProcess* ptr = reinterpret_cast<CImgProcess*>(ptr_param);
 	while (!ptr->raw_pic_data.empty())
 	{
 		ptr->raw_pic_data.front()->Release();

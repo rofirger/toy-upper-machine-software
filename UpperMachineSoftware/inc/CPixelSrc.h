@@ -9,7 +9,7 @@ class CPixelSrc : public CDialogEx
 
 public:
 	CPixelSrc(CWnd* pParent = nullptr);   // 标准构造函数
-	CPixelSrc(CSmartCarCam* parent_class);
+	CPixelSrc(CImgProcess* parent_class);
 	void GetFileFromDirectory(CString csDirPath, std::vector<CString>& vctPath);
 	void WriteSelectedFilePathToFile(std::string file_name, const std::vector<CString>& selected_file_name);
 	virtual ~CPixelSrc();
@@ -22,7 +22,7 @@ public:
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 private:
-	CSmartCarCam* scc_class;
+	CImgProcess* scc_class;
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedOk();

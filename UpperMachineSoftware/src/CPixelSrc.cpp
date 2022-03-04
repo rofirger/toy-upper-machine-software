@@ -15,7 +15,7 @@ CPixelSrc::CPixelSrc(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_PIXEL_SRC, pParent)
 {
 }
-CPixelSrc::CPixelSrc(CSmartCarCam* parent_class)
+CPixelSrc::CPixelSrc(CImgProcess* parent_class)
 	: CDialogEx(IDD_PIXEL_SRC)
 {
 	scc_class = parent_class;

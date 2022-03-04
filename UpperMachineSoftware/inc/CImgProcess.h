@@ -26,9 +26,9 @@ void EnableControlForPixelSrc(void* ptr_param_cscc, bool true_or_false);
 void EnableControlForDataSrc(void* ptr_param_cscc, bool true_or_false);
 // 从串口数据源、网络数据源中提取图片数据
 void PicDataProcess(void* ptr_param);
-// 串口数据源、网络数据源“开始”按钮执行前对 CSmartCarCam 类的数据进行更新
+// 串口数据源、网络数据源“开始”按钮执行前对 CImgProcess 类的数据进行更新
 void UpdateCSCCData(void* ptr_param);
-// 串口数据源、网络数据源“开始”按钮执行完成后对 CSmartCarCam 类的数据进行清除更新等操作
+// 串口数据源、网络数据源“开始”按钮执行完成后对 CImgProcess 类的数据进行清除更新等操作
 void ClearCSCCDate(void* ptr_param);
 class CDragListCtrl :public CListCtrl
 {
@@ -43,14 +43,14 @@ public:
 	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
 };
 
-class CSmartCarCam : public CDialogEx
+class CImgProcess : public CDialogEx
 {
-	DECLARE_DYNAMIC(CSmartCarCam)
+	DECLARE_DYNAMIC(CImgProcess)
 
 public:
-	CSmartCarCam(CWnd* pParent = nullptr);   // 标准构造函数
+	CImgProcess(CWnd* pParent = nullptr);   // 标准构造函数
 	void MainDlgDropFiles(const std::vector<CString>& main_dlg_drops_files);
-	virtual ~CSmartCarCam();
+	virtual ~CImgProcess();
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_IMGPROCESS };
 #endif
@@ -134,7 +134,7 @@ public:
 	afx_msg void OnNMClickList2(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar);
 	afx_msg void OnNMCustomdrawSlider2(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void OnNMCustomdrawSlider3(NMHDR* pNMHDR, LRESULT* pResult);
+	afx_msg void OnNMCustomdrawSliderPerspective(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnNMCustomdrawSlider1(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnPaint();
 	afx_msg void OnBnClickedButton1();
@@ -152,9 +152,17 @@ public:
 	afx_msg void OnBnClickedButtonSingleStepRight();
 	afx_msg void OnTcnSelchangeTabMode(NMHDR* pNMHDR, LRESULT* pResult);
 public:
+	typedef struct Pos
+	{
+		short x;
+		short y;
+	}Pos;
 	size_t* left_line = NULL;
 	size_t* mid_line = NULL;
 	size_t* right_line = NULL;
+	std::vector<Pos> perspective_left_line;
+	std::vector<Pos> perspective_mid_line;
+	std::vector<Pos> perspective_right_line;
 public:
 	std::string path_raw;
 	std::string path_process;
