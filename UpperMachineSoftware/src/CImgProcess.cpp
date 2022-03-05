@@ -1761,9 +1761,10 @@ unsigned char** CImgProcess::InternalBinaryProcess(unsigned char** pixel_mat_par
 	{
 		CString str_value;
 		GetDlgItem(IDC_EDIT_THRESHOLD_VALUE)->GetWindowText(str_value);
-		int threshold_val = _ttoi(str_value);
-
+		unsigned char threshold_val = _ttoi(str_value);
 		BinaryzationProcess(pixel_mat_param, img_process_param.rows, img_process_param.cols, threshold_val);
+		// 更新阈值显示
+		SetDlgItemTextW(IDC_EDIT_THRESHOLD_VALUE, CString(std::string(std::to_string(threshold_val)).c_str()));
 		for (int i = 0; i < img_process_param.rows; ++i)
 		{
 			for (int j = 0; j < img_process_param.cols; ++j)
