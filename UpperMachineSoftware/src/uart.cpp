@@ -9,7 +9,7 @@
 #include <list>
 
 using  namespace std;
-extern bool IS_GOOD_PID;
+extern bool is_finish_pid;
 //extern double* _y;
 extern double* _x;
 extern size_t y_now_index;
@@ -265,7 +265,7 @@ UINT WINAPI CSerialPort::ListenThread(void* pParam)
 			case PID:
 			{
 				const char split_char[] = "\t";
-				if (!IS_GOOD_PID && pSerialPort->ReadChar(cRecved) == true)
+				if (!is_finish_pid && pSerialPort->ReadChar(cRecved) == true)
 				{
 					if (cRecved == '\n')
 					{
@@ -437,8 +437,6 @@ void CSerialPort::ReadData(unsigned char* buff)
 				{
 					break;
 				}
-				//std::cout << UcharToHex(cRecved) << "\t";
-				//out << (unsigned char)cRecved << ',';
 				continue;
 			}
 		} while (--BytesInQue);

@@ -263,111 +263,11 @@ void CUart::OnBnClickedMainButton()
 		((void (*)(void*, bool))_data_src_param.GetPtrFuncEnableControl())(_data_src_param.GetPtrFuncEnableControlParam(), true);
 		// 清理数据
 		((void (*)(void*))_data_src_param.GetPtrFuncClearData())(_data_src_param.GetPtrFuncClearDataParam());
+		mySerialPort.ClosePort();
 	}
 }
 
-//void CUart::OnBnClickedMainButton()
-//{
-//	// 更新文件
-//	//WriteOperationInfoToFile();
-//	mySerialPort.SetReponseType(CSMARTCARCAM);
-//
-//	CString str;
-//	str.Format(_T("打开串口"));
-//	CString temp;
-//	GetDlgItemTextW(IDC_MAIN_BUTTON, temp);
-//	IS_STOP_RECONNECT = false;
-//
-//	PIC_DATA_SIZE = pic_data_height * pic_data_width;
-//
-//	if (temp == str)
-//	{
-//		UpdateParentFormData(update_parent_form_data_param);
-//		SetDlgItemTextW(IDC_MAIN_BUTTON, _T("关闭串口"));
-//		CString str1;
-//		GetDlgItemTextW(IDC_COMBO_COMS, str1);
-//		std::string coms_str((CW2A)str1.GetString());
-//		char* coms_chars_temp = new char[coms_str.length() - 2];
-//		for (int i = 3; i < coms_str.length(); ++i)
-//		{
-//			coms_chars_temp[i - 3] = coms_str[i];
-//		}
-//		coms_chars_temp[coms_str.length() - 3] = '\0';
-//		int coms = atoi(coms_chars_temp);
-//		GetDlgItemTextW(IDC_COMBO_BAUDRATE, str1);
-//		int baudRate = _ttoi(str1);
-//		GetDlgItemTextW(IDC_COMBO_DATABIT, str1);
-//		int dataBit = _ttoi(str1);
-//		GetDlgItemTextW(IDC_COMBO_STOPBIT, str1);
-//		int stopBit = _ttoi(str1);
-//		char parity = 'N';
-//		if (m_combo_check.GetCurSel() != 0)
-//			parity = 'Y';
-//		int nState1 = ((CButton*)GetDlgItem(IDC_CHECK_NOERR))->GetCheck();
-//		int nState2 = ((CButton*)GetDlgItem(IDC_CHECK_RECONNECT))->GetCheck();
-//		EnableControl(CSmartCam, false);
-//		((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON2)->EnableWindow(false);
-//		((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON7)->EnableWindow(false);
-//		((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON8)->EnableWindow(false);
-//
-//		if (nState2 == BST_CHECKED)
-//		{
-//			reconnect_timer.StartTimer(500, std::bind(ReconnectSmartCarCam, this, coms, baudRate, parity, dataBit, stopBit));
-//			return;
-//		}
-//
-//		if (mySerialPort.InitPort(coms, baudRate, parity, dataBit, stopBit))
-//		{
-//			if (!mySerialPort.OpenListenThread())
-//			{
-//				::MessageBox(NULL, _T("开启监听线程失败!"), _T("提示"), 0);
-//				mySerialPort.CloseListenTread();
-//				SetDlgItemTextW(IDC_MAIN_BUTTON, _T("打开串口"));
-//				EnableControl(CSmartCam, true);
-//				((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON2)->EnableWindow(true);
-//				((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON7)->EnableWindow(true);
-//				((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON8)->EnableWindow(true);
-//				return;
-//			}
-//			CString size_;
-//			((CWnd*)CSmartCam)->GetDlgItemTextW(IDC_EDIT_WIDTH, size_);
-//			int width_size = _ttoi(size_);
-//			((CWnd*)CSmartCam)->GetDlgItemTextW(IDC_EDIT_HEIGTH, size_);
-//			int height_size = _ttoi(size_);
-//			pic_size = width_size * height_size;
-//			pic_height = height_size;
-//			pic_width = width_size;
-//			reinterpret_cast<RefreshPicFuncParam*>(refresh_pic_func_param)->is_stop = false;
-//			refresh_timer.AsyncWait(100, std::bind(Reflesh_Pic, refresh_pic_func_param));
-//		}
-//		else if (nState1 != BST_CHECKED)
-//		{
-//			::MessageBox(NULL, _T("初始化串口失败!"), _T("提示"), 0);
-//			mySerialPort.CloseListenTread();
-//			SetDlgItemTextW(IDC_MAIN_BUTTON, _T("打开串口"));
-//			EnableControl(CSmartCam, true);
-//			((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON2)->EnableWindow(true);
-//			((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON7)->EnableWindow(true);
-//			((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON8)->EnableWindow(true);
-//		}
-//	}
-//	else
-//	{
-//		IS_STOP_RECONNECT = true;
-//		IS_FINISH_COLLECT = false;
-//		reinterpret_cast<RefreshPicFuncParam*>(refresh_pic_func_param)->is_stop = true;
-//		PIC_DATA.clear();
-//		reconnect_timer.Expire();
-//		mySerialPort.Restart();
-//		refresh_timer.Expire();
-//		SetDlgItemTextW(IDC_MAIN_BUTTON, _T("打开串口"));
-//		EnableControl(CSmartCam, true);
-//		((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON2)->EnableWindow(true);
-//		((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON7)->EnableWindow(true);
-//		((CWnd*)CSmartCam)->GetDlgItem(IDC_BUTTON8)->EnableWindow(true);
-//		ClearParentFormData(clear_data_func_param);
-//	}
-//}
+
 unsigned __stdcall DataAcquisitionUart(LPVOID lpParam)
 {
 	UartDataAcParam* ptr = reinterpret_cast<UartDataAcParam*>(lpParam);

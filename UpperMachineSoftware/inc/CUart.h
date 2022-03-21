@@ -42,13 +42,6 @@ public:
 	void ReadCom();
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	/*unsigned  (*Reflesh_Pic)(LPVOID) = nullptr;
-	void* refresh_pic_func_param = nullptr;
-	void(*EnableControl)(void* ptr_param_cscc, bool true_or_false) = nullptr;
-	void (*UpdateParentFormData)(void*) = nullptr;
-	void* update_parent_form_data_param = nullptr;
-	void (*ClearParentFormData)(void*) = nullptr;
-	void* clear_data_func_param = nullptr;*/
 public:
 	CSerialPort mySerialPort;
 	DataSrcParam& _data_src_param;

@@ -8,7 +8,7 @@
 #include <malloc.h>
 
 // CRTwaveform 对话框
-bool IS_GOOD_PID = false;
+bool is_finish_pid = false;
 double* _x = new double;
 // double* _y = new double;
 size_t y_now_index = 0;
@@ -187,7 +187,7 @@ void CRTwaveform::ReadCom()
 }
 void RefleshGram(CRTwaveform* ptr)
 {
-	if (IS_GOOD_PID)
+	if (is_finish_pid)
 	{
 		return;
 	}
@@ -262,7 +262,7 @@ void CRTwaveform::OnBnClickedButton3()
 	// TODO: 在此添加控件通知处理程序代码
 	mySerialPort.SetReponseType(PID);
 
-	IS_GOOD_PID = false;
+	is_finish_pid = false;
 
 	CString str;
 	str.Format(_T("打开串口"));
@@ -327,7 +327,7 @@ void CRTwaveform::OnBnClickedButton3()
 	}
 	else
 	{
-		IS_GOOD_PID = true;
+		is_finish_pid = true;
 		mySerialPort.Restart();
 		/*delete[]_y;
 		_y = new double;*/

@@ -105,6 +105,15 @@ public:
 	*/
 	bool ReadChar(char& cRecved);
 
+	/** 关闭串口
+	*
+	*
+	*  @return: void  操作是否成功
+	*  @note:
+	*  @see:
+	*/
+	void ClosePort();
+
 	void ReadOpen()
 	{
 		this->Readexit = false;
@@ -127,14 +136,7 @@ private:
 	*/
 	bool openPort(UINT  portNo);
 
-	/** 关闭串口
-	*
-	*
-	*  @return: void  操作是否成功
-	*  @note:
-	*  @see:
-	*/
-	void ClosePort();
+
 
 	/** 串口监听线程
 	*
