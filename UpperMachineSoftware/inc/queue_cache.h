@@ -5,7 +5,7 @@
 // 请注意该类的成员堆区内存需要专门的Release()函数释放
 class QueueCacheDataType
 {
-private:
+protected:
 	size_t _size_malloc;
 	size_t _size;
 	unsigned char* _array;

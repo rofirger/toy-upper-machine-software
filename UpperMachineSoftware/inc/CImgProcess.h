@@ -12,6 +12,7 @@
 #include "CNetServer.h"
 #include "DataSrcParam.hpp"
 #include "queue_cache.h"
+#include "to_file.hpp"
 
 static std::string DatetimeToString(tm tm_in);
 // 向文件写入字符串
@@ -30,6 +31,13 @@ void PicDataProcess(void* ptr_param);
 void UpdateCSCCData(void* ptr_param);
 // 串口数据源、网络数据源“开始”按钮执行完成后对 CImgProcess 类的数据进行清除更新等操作
 void ClearCSCCDate(void* ptr_param);
+typedef struct AuxiliaryLinesStruct
+{
+	LineArray* pleft_line;
+	LineArray* pmid_line;
+	LineArray* pright_line;
+}AuxiliaryLinesStruct;
+
 class CDragListCtrl :public CListCtrl
 {
 private:
@@ -46,7 +54,6 @@ public:
 class CImgProcess : public CDialogEx
 {
 	DECLARE_DYNAMIC(CImgProcess)
-
 public:
 	CImgProcess(CWnd* pParent = nullptr);   // 标准构造函数
 	void MainDlgDropFiles(const std::vector<CString>& main_dlg_drops_files);
@@ -57,10 +64,64 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
-
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
+
+private:
+	// 辅助线模块
+	LineArray left_line;
+	LineArray mid_line;
+	LineArray right_line;
+	LineArray perspective_left_line;
+	LineArray perspective_mid_line;
+	LineArray perspective_right_line;
+public:
+	// 与辅助线相关函数
+	void InitAuxiliaryLines(LineArray& _line, Pos* _array_ptr = nullptr, short _size = 0);
+	AuxiliaryLinesStruct GetAuxiliaryLines();
+	AuxiliaryLinesStruct GetAuxiliaryPerspectiveLines();
+	void DeleteAuxiliaryPerspectiveLines()
+	{
+		LineArray* temp_line = GetAuxiliaryPerspectiveLines().pleft_line;
+		if (temp_line->_array != nullptr && temp_line->_size > 0)
+		{
+			delete[]temp_line->_array;
+			temp_line->_array = nullptr;
+			temp_line->_index = 0;
+			temp_line->_size = 0;
+		}
+		temp_line = GetAuxiliaryPerspectiveLines().pmid_line;
+		if (temp_line->_array != nullptr && temp_line->_size > 0)
+		{
+			delete[]temp_line->_array;
+			temp_line->_array = nullptr;
+			temp_line->_index = 0;
+			temp_line->_size = 0;
+		}
+		temp_line = GetAuxiliaryPerspectiveLines().pright_line;
+		if (temp_line->_array != nullptr && temp_line->_size > 0)
+		{
+			delete[]temp_line->_array;
+			temp_line->_array = nullptr;
+			temp_line->_index = 0;
+			temp_line->_size = 0;
+		}
+	}
+private:
+	// 图像处理选择情况
+	// 图像处理选择情况, 目前四种，通过修改数值以添加新的处理
+	size_t process_sel[4];
+public:
+	void ZeroProcessSel() { process_sel[0] = 0, process_sel[1] = 1, process_sel[2] = 2, process_sel[3] = 3; }
+	void SetProcessSel(const size_t _index, const size_t _sel) { process_sel[_index] = _sel; }
+	size_t GetProcessSel(const size_t _index) { return process_sel[_index]; }
+	bool IsHaveProcessSel(const size_t _sel)
+	{
+		for (int i = 0; i < 4; ++i)
+			if (process_sel[i] == _sel)
+				return true;
+	}
 public:
 	CSerialPort mySerialPort;
 	Timer refresh_timer;
@@ -111,7 +172,13 @@ public:
 	CSliderCtrl m_slider_zoom_process;
 	CSliderCtrl m_slider_zoom_raw;
 	CSliderCtrl m_slider_zoom_perspective;
-
+protected:
+	rofirger::ToFile _data_to_file;
+public:
+	void WriteImgDataToFile(const std::string file_dic_path, const std::string  data, const int width, const int height, const int kind)
+	{
+		_data_to_file.InsertImgFile(file_dic_path, data, width, height, kind);
+	}
 public:
 	// 图片及坐标
 	int m_zoom_val_raw = 1;
@@ -151,18 +218,7 @@ public:
 	afx_msg void OnBnClickedButtonSingleStepLeft();
 	afx_msg void OnBnClickedButtonSingleStepRight();
 	afx_msg void OnTcnSelchangeTabMode(NMHDR* pNMHDR, LRESULT* pResult);
-public:
-	typedef struct Pos
-	{
-		short x;
-		short y;
-	}Pos;
-	size_t* left_line = NULL;
-	size_t* mid_line = NULL;
-	size_t* right_line = NULL;
-	std::vector<Pos> perspective_left_line;
-	std::vector<Pos> perspective_mid_line;
-	std::vector<Pos> perspective_right_line;
+
 public:
 	std::string path_raw;
 	std::string path_process;
@@ -174,7 +230,7 @@ public:
 	std::string user_input;
 	// 为用户提供RGB绘点
 	std::vector<std::vector<UserRGB>> user_rgb_mat_vec;
-	bool is_have_user_process = false;
+
 public:
 	/* 该区域与 CPixelSrc 联系 */
 

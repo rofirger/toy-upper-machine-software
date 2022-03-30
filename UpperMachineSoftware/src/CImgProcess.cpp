@@ -273,6 +273,35 @@ void CImgProcess::ReadOperationInfoFromFile()
 	ReadPixelSelectedFile("pixel_file_selected.dat", pixel_src_file_path_selected);
 }
 
+/*
+* 辅助线相关函数
+*/
+
+AuxiliaryLinesStruct CImgProcess::GetAuxiliaryLines()
+{
+	struct AuxiliaryLinesStruct ret;
+	ret.pleft_line = &left_line;
+	ret.pmid_line = &mid_line;
+	ret.pright_line = &right_line;
+	return ret;
+}
+
+AuxiliaryLinesStruct CImgProcess::GetAuxiliaryPerspectiveLines()
+{
+	struct AuxiliaryLinesStruct ret;
+	ret.pleft_line = &perspective_left_line;
+	ret.pmid_line = &perspective_mid_line;
+	ret.pright_line = &perspective_right_line;
+	return ret;
+}
+
+void CImgProcess::InitAuxiliaryLines(LineArray& _line, Pos* _array_ptr, short _size)
+{
+	_line._array = _array_ptr;
+	_line._size = _size;
+	_line._index = 0;
+}
+
 BOOL CImgProcess::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
@@ -393,7 +422,6 @@ BOOL CImgProcess::OnInitDialog()
 				  // 异常: OCX 属性页应返回 FALSE
 }
 unsigned __stdcall RefleshPic(LPVOID lpParam)
-//void RefleshPic(void* ptr_param)
 {
 	RefreshPicFuncParam* ptr_param = reinterpret_cast<RefreshPicFuncParam*>(lpParam);
 	CImgProcess* ptr = reinterpret_cast<CImgProcess*>(ptr_param->form);
@@ -486,7 +514,7 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 		bitInfo.bmiHeader.biXPelsPerMeter = 0;
 		bitInfo.bmiHeader.biYPelsPerMeter = 0;
 		BITMAPINFO_X pBmpInfo;
-		memcpy(&pBmpInfo.bmiHeader, &bitInfo, sizeof(BITMAPINFOHEADER));
+		::memcpy(&pBmpInfo.bmiHeader, &bitInfo, sizeof(BITMAPINFOHEADER));
 		//构造灰度图的调色版
 		for (int i = 0; i < 256; i++)
 		{
@@ -545,27 +573,14 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			// 保存像素文件
 			else
 			{
-				time_t timep;
-				struct tm* param_time;
-				time(&timep);
-				param_time = localtime(&timep);
-				std::string temp_time = DatetimeToString(*param_time);
-				std::string filename_param = ptr->path_raw + "\\" + temp_time + "_raw_.sfp";
-				std::fstream write_file;
-				write_file.open(filename_param, std::ios::out | std::ios::binary);
-				for (int i = 0; i < img.rows; ++i)
-				{
-					for (int j = 0; j < img.cols; ++j)
-					{
-						write_file.write((char*)&img.at<uchar>(i, j), sizeof(unsigned char));
-					}
-				}
+				std::string temp_raw_img((char*)img.data, img.rows * img.cols);
 				// 写入图片额外信息
 				int kind_pic = ptr->m_combo_pictype.GetCurSel();
-				write_file.write((char*)&ptr->pic_width, sizeof(int));
-				write_file.write((char*)&ptr->pic_height, sizeof(int));
-				write_file.write((char*)&kind_pic, sizeof(int));
-				write_file.close();
+				// 写入图片额外信息
+				ptr->WriteImgDataToFile(ptr->path_raw, temp_raw_img,
+					ptr->pic_width,
+					ptr->pic_height,
+					kind_pic);
 			}
 		}
 
@@ -588,13 +603,12 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 		bool is_show_left_line = true;
 		bool is_show_mid_line = true;
 		bool is_show_right_line = true;
-
-		ptr->is_have_user_process = false;
-
+		ptr->ZeroProcessSel();
 		try
 		{
 			UserProcessRet user_process_ret;
 			// 图像处理函数调用
+			ptr->SetProcessSel(0, ptr->m_combo_process_one.GetCurSel());
 			switch (ptr->m_combo_process_one.GetCurSel())
 			{
 			case 1:
@@ -605,7 +619,6 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -615,6 +628,8 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			default:
 				break;
 			}
+
+			ptr->SetProcessSel(1, ptr->m_combo_process_two.GetCurSel());
 			switch (ptr->m_combo_process_two.GetCurSel())
 			{
 			case 1:
@@ -625,7 +640,6 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -635,6 +649,8 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			default:
 				break;
 			}
+
+			ptr->SetProcessSel(2, ptr->m_combo_process_three.GetCurSel());
 			switch (ptr->m_combo_process_three.GetCurSel())
 			{
 			case 1:
@@ -645,7 +661,6 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -655,6 +670,8 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			default:
 				break;
 			}
+
+			ptr->SetProcessSel(3, ptr->m_combo_process_four.GetCurSel());
 			switch (ptr->m_combo_process_four.GetCurSel())
 			{
 			case 1:
@@ -665,7 +682,6 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -690,6 +706,80 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 		{
 			CString err_msg(e.what());
 			::MessageBox(NULL, err_msg, _T("错误提示"), 0);
+		}
+		// 辅助线显示
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "using left_line, mid_line and right_line arrays");
+		if (is_show_left_line)
+		{
+			Pos* array = ptr->GetAuxiliaryPerspectiveLines().pleft_line->_array;
+			if (array != NULL && ptr->GetAuxiliaryPerspectiveLines().pleft_line->_size > 0)
+			{
+				size_t num = ptr->GetAuxiliaryPerspectiveLines().pleft_line->_index;
+				for (size_t i = 0; i < num; ++i)
+				{
+					img_process.at<uchar>(array[i].y, array[i].x) = 0;
+				}
+			}
+			else
+			{
+				array = ptr->GetAuxiliaryLines().pleft_line->_array;
+				if (array != NULL && ptr->GetAuxiliaryLines().pleft_line->_size > 0)
+				{
+					size_t num = ptr->GetAuxiliaryLines().pleft_line->_index;
+					for (size_t i = 0; i < num; ++i)
+					{
+						img_process.at<uchar>(array[i].y, array[i].x) = 0;
+					}
+				}
+			}
+		}
+		if (is_show_mid_line)
+		{
+			Pos* array = ptr->GetAuxiliaryPerspectiveLines().pmid_line->_array;
+			if (array != NULL && ptr->GetAuxiliaryPerspectiveLines().pmid_line->_size > 0)
+			{
+				size_t num = ptr->GetAuxiliaryPerspectiveLines().pmid_line->_index;
+				for (size_t i = 0; i < num; ++i)
+				{
+					img_process.at<uchar>(array[i].y, array[i].x) = 0;
+				}
+			}
+			else
+			{
+				array = ptr->GetAuxiliaryLines().pmid_line->_array;
+				if (array != NULL && ptr->GetAuxiliaryLines().pmid_line->_size > 0)
+				{
+					size_t num = ptr->GetAuxiliaryLines().pmid_line->_index;
+					for (size_t i = 0; i < num; ++i)
+					{
+						img_process.at<uchar>(array[i].y, array[i].x) = 0;
+					}
+				}
+			}
+		}
+		if (is_show_right_line)
+		{
+			Pos* array = ptr->GetAuxiliaryPerspectiveLines().pright_line->_array;
+			if (array != NULL && ptr->GetAuxiliaryPerspectiveLines().pright_line->_size > 0)
+			{
+				size_t num = ptr->GetAuxiliaryPerspectiveLines().pright_line->_index;
+				for (size_t i = 0; i < num; ++i)
+				{
+					img_process.at<uchar>(array[i].y, array[i].x) = 0;
+				}
+			}
+			else
+			{
+				array = ptr->GetAuxiliaryLines().pright_line->_array;
+				if (array != NULL && ptr->GetAuxiliaryLines().pright_line->_size > 0)
+				{
+					size_t num = ptr->GetAuxiliaryLines().pright_line->_index;
+					for (size_t i = 0; i < num; ++i)
+					{
+						img_process.at<uchar>(array[i].y, array[i].x) = 0;
+					}
+				}
+			}
 		}
 
 		// 缩放图片
@@ -733,27 +823,12 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 			// 保存像素文件
 			else
 			{
-				time_t timep;
-				struct tm* param_time;
-				time(&timep);
-				param_time = localtime(&timep);
-				std::string temp_time = DatetimeToString(*param_time);
-				std::string filename_param = ptr->path_process + "\\" + temp_time + "_process_.sfp";
-				std::fstream write_file;
-				write_file.open(filename_param, std::ios::out | std::ios::binary);
-				for (int i = 0; i < img_process.rows; ++i)
-				{
-					for (int j = 0; j < img_process.cols; ++j)
-					{
-						write_file.write((char*)&img_process.at<uchar>(i, j), sizeof(unsigned char));
-					}
-				}
+				std::string temp_process_img((char*)img_process.data, img_process.rows * img_process.cols);
 				// 写入图片额外信息
-				int kind_pic = ptr->m_combo_pictype.GetCurSel();
-				write_file.write((char*)&ptr->pic_width, sizeof(int));
-				write_file.write((char*)&ptr->pic_height, sizeof(int));
-				write_file.write((char*)&kind_pic, sizeof(int));
-				write_file.close();
+				ptr->WriteImgDataToFile(ptr->path_process, temp_process_img,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_width,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_height,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_kind);
 			}
 		}
 		// 释放像素数组
@@ -797,85 +872,35 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 		ptr->ScreenToClient(&rect_refresh_process_img);
 		ptr->InvalidateRect(&rect_refresh_process_img, true);
 
-		//CDC* pDC_ = ptr->GetDlgItem(IDC_STATIC_PROCESS_PIC)->GetDC();  //获取图片控件DC
-		//	//绘图
-		//::StretchDIBits(
-		//	pDC_->GetSafeHdc(),
-		//	0, 0, img_process.cols, img_process.rows,
-		//	0, 0, img_process.cols, img_process.rows,
-		//	img_process.data,
-		//	(BITMAPINFO*)&pBmpInfo_,
-		//	DIB_RGB_COLORS,
-		//	SRCCOPY
-		//);
-		//ptr->ReleaseDC(pDC_);  //释放DC
-		CDC* pDC_ = ptr->GetDlgItem(IDC_STATIC_PROCESS_PIC)->GetDC();  //获取图片控件DC
-		int nWindowW_ = rect_.Width();				                  //获取窗口宽度
-		int nWindowH_ = rect_.Height();				                  //获取窗口高度
+		int nWindowW_ = rect_.Width();				//获取窗口宽度
+		int nWindowH_ = rect_.Height();				//获取窗口高度
 		int nImageW_ = img_process.cols;				//获取图片宽度
 		int nImageH_ = img_process.rows;				//获取图片高度
-		ptr->ScreenToClient(&rect_);
+		ptr->ScreenToClient(&rect);
 		ptr->m_pos_process_x_zero = (int)(rect_.Width() - nImageW_) / 2;
 		ptr->m_pos_process_y_zero = (int)(rect_.Height() - nImageH_) / 2;
-		//绘图
-		//::StretchDIBits(
-		//	pDC_->GetSafeHdc(),
-		//	(int)(nWindowW_ - nImageW_) / 2, (int)(nWindowH_ - nImageH_) / 2, img_process.cols, img_process.rows,
-		//	0, 0, img_process.cols, img_process.rows,
-		//	img_process.data,
-		//	(BITMAPINFO*)&pBmpInfo_,
-		//	DIB_RGB_COLORS,
-		//	SRCCOPY
-		//);
-
-		// RGB服务
-		CDC MemDC; //首先定义一个显示设备对象
-		CBitmap MemBitmap;//定义一个位图对象
-		//随后建立与屏幕显示兼容的内存显示设备
-		MemDC.CreateCompatibleDC(NULL);
-		MemBitmap.CreateCompatibleBitmap(pDC_, rect_.Width(), rect_.Height());
-		CBitmap* pOldBit = MemDC.SelectObject(&MemBitmap);
-
-		if (ptr->is_have_user_process)
-		{
-			CClientDC user_rgb_dc(ptr);
-			for (int i = 0; i < ptr->user_rgb_mat_vec.size(); ++i)
-			{
-				for (int j = 0; j < ptr->user_rgb_mat_vec[0].size(); ++j)
-				{
-					if (ptr->user_rgb_mat_vec[i][j].is_show)
-					{
-						MemDC.SetPixel(rect_.left + ptr->m_pos_process_x_zero + j, rect_.top + ptr->m_pos_process_y_zero + i, RGB(ptr->user_rgb_mat_vec[i][j].r, ptr->user_rgb_mat_vec[i][j].g, ptr->user_rgb_mat_vec[i][j].b));
-					}
-				}
-			}
-		}
-		pDC_->BitBlt(ptr->m_pos_process_x_zero, ptr->m_pos_process_y_zero, img_process.cols, img_process.rows,
-			&MemDC, 0, 0, SRCCOPY);       //绘图完成后的清理
-		MemBitmap.DeleteObject();
-		MemDC.DeleteDC();
-
-		ptr->ReleaseDC(pDC_);  //释放DC
-
 		// 释放线数组
-		if (ptr->left_line != NULL)
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "free left_line, mid_line and right_line arrays");
+		DeleteAuxiliaryProcessLines(ptr->GetAuxiliaryLines().pleft_line, ptr->GetAuxiliaryLines().pmid_line, ptr->GetAuxiliaryLines().pright_line);
+		// 自身产生的透视变换数组
+		ptr->DeleteAuxiliaryPerspectiveLines();
+
+		if (ptr->is_single_step_pixel_src == false)
 		{
-			delete[]ptr->left_line;
-			ptr->left_line = NULL;
-			ptr->perspective_left_line.clear();
+			ptr->pixel_src_file_path_selected_index++;
 		}
-		if (ptr->mid_line != NULL)
+		if (ptr->pixel_src_file_path_selected_index >= ptr->pixel_src_file_path_selected.size())
 		{
-			delete[]ptr->mid_line;
-			ptr->mid_line = NULL;
-			ptr->perspective_mid_line.clear();
+			ptr->is_start_pixel_src = false;
+			ptr->pixel_src_file_path_selected_index = 0;
+			ptr->SetDlgItemText(IDC_BUTTON7, _T("开始"));
+			EnableControlForPixelSrc(ptr, true);
+			::MessageBox(NULL, _T("资源均已被加载！"), _T("提示"), 0);
+			// 更新 IDC_PIXEL_SRC_PATH 显示
+			ptr->SetDlgItemTextW(IDC_PIXEL_SRC_PATH, _T(""));
+			return 0;
 		}
-		if (ptr->right_line != NULL)
-		{
-			delete[]ptr->right_line;
-			ptr->right_line = NULL;
-			ptr->perspective_right_line.clear();
-		}
+
 	}
 	return 0;
 }
@@ -990,7 +1015,6 @@ void RefleshPicPixel(CImgProcess* ptr)
 		ptr->ScreenToClient(&rect_refresh_raw_img);
 		ptr->InvalidateRect(&rect_refresh_raw_img, true);
 
-		CDC* pDC = ptr->GetDlgItem(IDC_STATIC_PIC)->GetDC();  //获取图片控件DC
 		int nWindowW = rect.Width();				                  //获取窗口宽度
 		int nWindowH = rect.Height();				                  //获取窗口高度
 		int nImageW = img.cols;				//获取图片宽度
@@ -1000,17 +1024,6 @@ void RefleshPicPixel(CImgProcess* ptr)
 		ptr->ScreenToClient(&rect);
 		ptr->m_pos_raw_x_zero = (int)(rect.Width() - nImageW) / 2;
 		ptr->m_pos_raw_y_zero = (int)(rect.Height() - nImageH) / 2;
-		//绘图
-		//::StretchDIBits(
-		//	pDC->GetSafeHdc(),
-		//	(int)(nWindowW - nImageW) / 2, (int)(nWindowH - nImageH) / 2, img.cols, img.rows,
-		//	0, 0, img.cols, img.rows,
-		//	img.data,
-		//	(BITMAPINFO*)&pBmpInfo,
-		//	DIB_RGB_COLORS,
-		//	SRCCOPY
-		//);
-		ptr->ReleaseDC(pDC);  //释放DC
 
 		// 保存原图像
 		CString img_("保存摄像头原图");
@@ -1033,26 +1046,12 @@ void RefleshPicPixel(CImgProcess* ptr)
 			// 保存像素文件
 			else
 			{
-				time_t timep;
-				struct tm* param_time;
-				time(&timep);
-				param_time = localtime(&timep);
-				std::string temp_time = DatetimeToString(*param_time);
-				std::string filename_param = ptr->path_raw + "\\" + temp_time + "_raw_.sfp";
-				std::fstream write_file;
-				write_file.open(filename_param, std::ios::out | std::ios::binary);
-				for (int i = 0; i < img.rows; ++i)
-				{
-					for (int j = 0; j < img.cols; ++j)
-					{
-						write_file.write((char*)&img.at<uchar>(i, j), sizeof(unsigned char));
-					}
-				}
+				std::string temp_raw_img((char*)img.data, img.rows * img.cols);
 				// 写入图片额外信息
-				write_file.write((char*)&ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_width, sizeof(int));
-				write_file.write((char*)&ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_height, sizeof(int));
-				write_file.write((char*)&ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_kind, sizeof(int));
-				write_file.close();
+				ptr->WriteImgDataToFile(ptr->path_raw, temp_raw_img,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_width,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_height,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_kind);
 			}
 		}
 
@@ -1075,11 +1074,12 @@ void RefleshPicPixel(CImgProcess* ptr)
 		bool is_show_left_line = true;
 		bool is_show_mid_line = true;
 		bool is_show_right_line = true;
-		ptr->is_have_user_process = false;
+		ptr->ZeroProcessSel();
 		try
 		{
 			UserProcessRet user_process_ret;
 			// 图像处理函数调用
+			ptr->SetProcessSel(0, ptr->m_combo_process_one.GetCurSel());
 			switch (ptr->m_combo_process_one.GetCurSel())
 			{
 			case 1:
@@ -1090,7 +1090,6 @@ void RefleshPicPixel(CImgProcess* ptr)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -1100,6 +1099,8 @@ void RefleshPicPixel(CImgProcess* ptr)
 			default:
 				break;
 			}
+
+			ptr->SetProcessSel(1, ptr->m_combo_process_two.GetCurSel());
 			switch (ptr->m_combo_process_two.GetCurSel())
 			{
 			case 1:
@@ -1110,7 +1111,6 @@ void RefleshPicPixel(CImgProcess* ptr)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -1120,6 +1120,8 @@ void RefleshPicPixel(CImgProcess* ptr)
 			default:
 				break;
 			}
+
+			ptr->SetProcessSel(2, ptr->m_combo_process_three.GetCurSel());
 			switch (ptr->m_combo_process_three.GetCurSel())
 			{
 			case 1:
@@ -1130,7 +1132,6 @@ void RefleshPicPixel(CImgProcess* ptr)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -1140,6 +1141,8 @@ void RefleshPicPixel(CImgProcess* ptr)
 			default:
 				break;
 			}
+
+			ptr->SetProcessSel(3, ptr->m_combo_process_four.GetCurSel());
 			switch (ptr->m_combo_process_four.GetCurSel())
 			{
 			case 1:
@@ -1150,7 +1153,6 @@ void RefleshPicPixel(CImgProcess* ptr)
 			{pixel_mat = ptr->InternalPerspectiveProcess(pixel_mat, img_process, max_zoom_val); break; }
 			case 4:
 			{
-				ptr->is_have_user_process = true;
 				user_process_ret = ptr->InternalUserProcess(pixel_mat, img_process, max_zoom_val, is_show_left_line, is_show_mid_line, is_show_right_line);
 				pixel_mat = user_process_ret.dst_pixel_mat;
 				_rows = user_process_ret.dst_rows;
@@ -1178,54 +1180,75 @@ void RefleshPicPixel(CImgProcess* ptr)
 		}
 		// 辅助线显示
 		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "using left_line, mid_line and right_line arrays");
-		if (is_show_left_line && ptr->left_line != NULL)
+		if (is_show_left_line)
 		{
-			if (ptr->perspective_left_line.size() != 0)
+			Pos* array = ptr->GetAuxiliaryPerspectiveLines().pleft_line->_array;
+			if (array != NULL && ptr->GetAuxiliaryPerspectiveLines().pleft_line->_size > 0)
 			{
-				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				size_t num = ptr->GetAuxiliaryPerspectiveLines().pleft_line->_index;
+				for (size_t i = 0; i < num; ++i)
 				{
-					img_process.at<uchar>(ptr->perspective_left_line[i].y, ptr->perspective_left_line[i].x) = 0;
+					img_process.at<uchar>(array[i].y, array[i].x) = 0;
 				}
 			}
 			else
 			{
-				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				array = ptr->GetAuxiliaryLines().pleft_line->_array;
+				if (array != NULL && ptr->GetAuxiliaryLines().pleft_line->_size > 0)
 				{
-					img_process.at<uchar>(i, ptr->left_line[i]) = 0;
+					size_t num = ptr->GetAuxiliaryLines().pleft_line->_index;
+					for (size_t i = 0; i < num; ++i)
+					{
+						img_process.at<uchar>(array[i].y, array[i].x) = 0;
+					}
 				}
 			}
 		}
-		if (is_show_mid_line && ptr->mid_line != NULL)
+		if (is_show_mid_line)
 		{
-			if (ptr->perspective_mid_line.size() != 0)
+			Pos* array = ptr->GetAuxiliaryPerspectiveLines().pmid_line->_array;
+			if (array != NULL && ptr->GetAuxiliaryPerspectiveLines().pmid_line->_size > 0)
 			{
-				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				size_t num = ptr->GetAuxiliaryPerspectiveLines().pmid_line->_index;
+				for (size_t i = 0; i < num; ++i)
 				{
-					img_process.at<uchar>(ptr->perspective_mid_line[i].y, ptr->perspective_mid_line[i].x) = 0;
+					img_process.at<uchar>(array[i].y, array[i].x) = 0;
 				}
 			}
 			else
 			{
-				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				array = ptr->GetAuxiliaryLines().pmid_line->_array;
+				if (array != NULL && ptr->GetAuxiliaryLines().pmid_line->_size > 0)
 				{
-					img_process.at<uchar>(i, ptr->mid_line[i]) = 0;
+					size_t num = ptr->GetAuxiliaryLines().pmid_line->_index;
+					for (size_t i = 0; i < num; ++i)
+					{
+						img_process.at<uchar>(array[i].y, array[i].x) = 0;
+					}
 				}
 			}
 		}
-		if (is_show_right_line && ptr->right_line != NULL)
+		if (is_show_right_line)
 		{
-			if (ptr->perspective_right_line.size() != 0)
+			Pos* array = ptr->GetAuxiliaryPerspectiveLines().pright_line->_array;
+			if (array != NULL && ptr->GetAuxiliaryPerspectiveLines().pright_line->_size > 0)
 			{
-				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				size_t num = ptr->GetAuxiliaryPerspectiveLines().pright_line->_index;
+				for (size_t i = 0; i < num; ++i)
 				{
-					img_process.at<uchar>(ptr->perspective_right_line[i].y, ptr->perspective_right_line[i].x) = 0;
+					img_process.at<uchar>(array[i].y, array[i].x) = 0;
 				}
 			}
 			else
 			{
-				for (int i = 0; i < img_process.rows / ptr->m_zoom_val_perspective; ++i)
+				array = ptr->GetAuxiliaryLines().pright_line->_array;
+				if (array != NULL && ptr->GetAuxiliaryLines().pright_line->_size > 0)
 				{
-					img_process.at<uchar>(i, ptr->right_line[i]) = 0;
+					size_t num = ptr->GetAuxiliaryLines().pright_line->_index;
+					for (size_t i = 0; i < num; ++i)
+					{
+						img_process.at<uchar>(array[i].y, array[i].x) = 0;
+					}
 				}
 			}
 		}
@@ -1271,26 +1294,12 @@ void RefleshPicPixel(CImgProcess* ptr)
 			// 保存像素文件
 			else
 			{
-				time_t timep;
-				struct tm* param_time;
-				time(&timep);
-				param_time = localtime(&timep);
-				std::string temp_time = DatetimeToString(*param_time);
-				std::string filename_param = ptr->path_process + "\\" + temp_time + "_process_.sfp";
-				std::fstream write_file;
-				write_file.open(filename_param, std::ios::out | std::ios::binary);
-				for (int i = 0; i < img_process.rows; ++i)
-				{
-					for (int j = 0; j < img_process.cols; ++j)
-					{
-						write_file.write((char*)&img_process.at<uchar>(i, j), sizeof(unsigned char));
-					}
-				}
+				std::string temp_process_img((char*)img_process.data, img_process.rows * img_process.cols);
 				// 写入图片额外信息
-				write_file.write((char*)&ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_width, sizeof(int));
-				write_file.write((char*)&ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_height, sizeof(int));
-				write_file.write((char*)&ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_kind, sizeof(int));
-				write_file.close();
+				ptr->WriteImgDataToFile(ptr->path_process, temp_process_img,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_width,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_height,
+					ptr->pic_info[ptr->pixel_src_file_path_selected_index].pic_kind);
 			}
 		}
 		// 释放像素数组
@@ -1334,7 +1343,6 @@ void RefleshPicPixel(CImgProcess* ptr)
 		ptr->ScreenToClient(&rect_refresh_process_img);
 		ptr->InvalidateRect(&rect_refresh_process_img, true);
 
-		CDC* pDC_ = ptr->GetDlgItem(IDC_STATIC_PROCESS_PIC)->GetDC();  //获取图片控件DC
 		int nWindowW_ = rect_.Width();				//获取窗口宽度
 		int nWindowH_ = rect_.Height();				//获取窗口高度
 		int nImageW_ = img_process.cols;				//获取图片宽度
@@ -1342,67 +1350,12 @@ void RefleshPicPixel(CImgProcess* ptr)
 		ptr->ScreenToClient(&rect);
 		ptr->m_pos_process_x_zero = (int)(rect_.Width() - nImageW_) / 2;
 		ptr->m_pos_process_y_zero = (int)(rect_.Height() - nImageH_) / 2;
-		//绘图
-		//::StretchDIBits(
-		//	pDC_->GetSafeHdc(),
-		//	(int)(nWindowW_ - nImageW_) / 2, (int)(nWindowH_ - nImageH_) / 2, img_process.cols, img_process.rows,
-		//	0, 0, img_process.cols, img_process.rows,
-		//	img_process.data,
-		//	(BITMAPINFO*)&pBmpInfo_,
-		//	DIB_RGB_COLORS,
-		//	SRCCOPY
-		//);
-		//// RGB服务
-		////CDC MemDC; //首先定义一个显示设备对象
-		////CBitmap MemBitmap;//定义一个位图对象
-		//////随后建立与屏幕显示兼容的内存显示设备
-		////MemDC.CreateCompatibleDC(NULL);
-		////MemBitmap.CreateCompatibleBitmap(pDC_, rect_.Width(), rect_.Height());
-		////CBitmap* pOldBit = MemDC.SelectObject(&MemBitmap);
-		////pDC_->BitBlt(ptr->m_pos_process_x_zero, ptr->m_pos_process_y_zero, img_process.cols, img_process.rows,
-		////	&MemDC, 0, 0, SRCCOPY);       //绘图完成后的清理
-		//if (ptr->is_have_user_process)
-		//{
-		//	CClientDC user_rgb_dc(ptr);
-		//	for (int i = 0; i < ptr->user_rgb_mat_vec.size(); ++i)
-		//	{
-		//		for (int j = 0; j < ptr->user_rgb_mat_vec[0].size(); ++j)
-		//		{
-		//			if (ptr->user_rgb_mat_vec[i][j].is_show)
-		//			{
-		//				pDC_->SetPixel(ptr->m_pos_process_x_zero + j, ptr->m_pos_process_y_zero + i, RGB(ptr->user_rgb_mat_vec[i][j].r, ptr->user_rgb_mat_vec[i][j].g, ptr->user_rgb_mat_vec[i][j].b));
-		//			}
-		//			pDC_->SetPixel(ptr->m_pos_process_x_zero + j, ptr->m_pos_process_y_zero + i, RGB(100, 100, 100));
-
-		//		}
-		//	}
-		//}
-		////pDC_->BitBlt(ptr->m_pos_process_x_zero, ptr->m_pos_process_y_zero, img_process.cols, img_process.rows,
-		////	&MemDC, 0, 0, SRCCOPY);       //绘图完成后的清理
-		////MemBitmap.DeleteObject();
-		////MemDC.DeleteDC();
-
-		//ptr->ReleaseDC(pDC_);  //释放DC
 		// 释放线数组
 		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "free left_line, mid_line and right_line arrays");
-		if (ptr->left_line != NULL)
-		{
-			delete[]ptr->left_line;
-			ptr->left_line = NULL;
-			ptr->perspective_left_line.clear();
-		}
-		if (ptr->mid_line != NULL)
-		{
-			delete[]ptr->mid_line;
-			ptr->mid_line = NULL;
-			ptr->perspective_mid_line.clear();
-		}
-		if (ptr->right_line != NULL)
-		{
-			delete[]ptr->right_line;
-			ptr->right_line = NULL;
-			ptr->perspective_right_line.clear();
-		}
+		DeleteAuxiliaryProcessLines(ptr->GetAuxiliaryLines().pleft_line, ptr->GetAuxiliaryLines().pmid_line, ptr->GetAuxiliaryLines().pright_line);
+		// 自身产生的透视变换数组
+		ptr->DeleteAuxiliaryPerspectiveLines();
+
 		if (ptr->is_single_step_pixel_src == false)
 		{
 			ptr->pixel_src_file_path_selected_index++;
@@ -1786,15 +1739,12 @@ unsigned char** CImgProcess::InternalAuxiliaryProcess(unsigned char** pixel_mat_
 	{
 		// 辅助线
 		CString str_value;
+		// 获取编辑框的阈值数值
 		GetDlgItem(IDC_EDIT_THRESHOLD_VALUE)->GetWindowText(str_value);
 		int threshold_val = _ttoi(str_value);
+		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "InternalAuxiliaryProcess");
 
-		left_line = new size_t[img_process_param.rows];
-		mid_line = new size_t[img_process_param.rows];
-		right_line = new size_t[img_process_param.rows];
-		rofirger::add_log(rofirger::LOG_LEVEL_INFO, "new left_line, mid_line and right_line arrays size of %d bytes", img_process_param.rows);
-
-		AuxiliaryProcess(pixel_mat_param, img_process_param.rows, img_process_param.cols, threshold_val, left_line, mid_line, right_line);
+		AuxiliaryProcess(pixel_mat_param, img_process_param.rows, img_process_param.cols, threshold_val, GetAuxiliaryLines().pleft_line, GetAuxiliaryLines().pmid_line, GetAuxiliaryLines().pright_line);
 		for (int i = 0; i < img_process_param.rows; ++i)
 		{
 			for (int j = 0; j < img_process_param.cols; ++j)
@@ -1839,48 +1789,64 @@ unsigned char** CImgProcess::InternalPerspectiveProcess(unsigned char** pixel_ma
 		unsigned char** dst_img_mat = PerspectiveTransformProcess(pixel_mat_param, old_rows, old_cols, dst_rows, dst_cols, transform_mat);
 		cv::resize(img_process_param, img_process_param, Size(dst_cols, dst_rows));
 		/* 若存在辅助线，一并逆透视处理 */
-		if (left_line != NULL && mid_line != NULL && right_line != NULL)
+		LineArray* ptemp_perspective_left_line = GetAuxiliaryPerspectiveLines().pleft_line;
+		LineArray* ptemp_perspective_mid_line = GetAuxiliaryPerspectiveLines().pmid_line;
+		LineArray* ptemp_perspective_right_line = GetAuxiliaryPerspectiveLines().pright_line;
+		LineArray* ptemp_left_line = GetAuxiliaryLines().pleft_line;
+		LineArray* ptemp_mid_line = GetAuxiliaryLines().pmid_line;
+		LineArray* ptemp_right_line = GetAuxiliaryLines().pright_line;
+		if (ptemp_left_line->_array != nullptr && ptemp_mid_line->_array != nullptr && ptemp_right_line->_array != nullptr)
 		{
-			perspective_left_line.resize(old_rows);
-			perspective_mid_line.resize(old_rows);
-			perspective_right_line.resize(old_rows);
-			for (size_t i_ = 0; i_ < old_rows; ++i_)
+			DeleteAuxiliaryPerspectiveLines();
+			size_t num_left_line_size = ptemp_left_line->_index;
+			size_t num_mid_line_size = ptemp_mid_line->_index;
+			size_t num_right_line_size = ptemp_right_line->_index;
+			ptemp_perspective_left_line->_array = new Pos[num_left_line_size];
+			ptemp_perspective_mid_line->_array = new Pos[num_mid_line_size];
+			ptemp_perspective_right_line->_array = new Pos[num_right_line_size];
+			for (size_t i_ = 0; i_ < num_left_line_size; ++i_)
 			{
 				double x, y, w;
-				x = transform_mat[0][0] * left_line[i_] + transform_mat[0][1] * i_ + transform_mat[0][2];
-				y = transform_mat[1][0] * left_line[i_] + transform_mat[1][1] * i_ + transform_mat[1][2];
-				w = transform_mat[2][0] * left_line[i_] + transform_mat[2][1] * i_ + transform_mat[2][2];
+				x = transform_mat[0][0] * ptemp_left_line->_array[i_].x + transform_mat[0][1] * ptemp_left_line->_array[i_].y + transform_mat[0][2];
+				y = transform_mat[1][0] * ptemp_left_line->_array[i_].x + transform_mat[1][1] * ptemp_left_line->_array[i_].y + transform_mat[1][2];
+				w = transform_mat[2][0] * ptemp_left_line->_array[i_].x + transform_mat[2][1] * ptemp_left_line->_array[i_].y + transform_mat[2][2];
 				int dst_col = (int)round(x / w);
 				int dst_row = (int)round(y / w);
 				if (dst_col >= 0 && dst_col < dst_cols
 					&& dst_row >= 0 && dst_row < dst_rows)
 				{
-					perspective_left_line[i_].x = dst_col;
-					perspective_left_line[i_].y = dst_row;
+					ptemp_perspective_left_line->_array[i_].x = dst_col;
+					ptemp_perspective_left_line->_array[i_].y = dst_row;
 				}
-
-				x = transform_mat[0][0] * mid_line[i_] + transform_mat[0][1] * i_ + transform_mat[0][2];
-				y = transform_mat[1][0] * mid_line[i_] + transform_mat[1][1] * i_ + transform_mat[1][2];
-				w = transform_mat[2][0] * mid_line[i_] + transform_mat[2][1] * i_ + transform_mat[2][2];
-				dst_col = (int)round(x / w);
-				dst_row = (int)round(y / w);
+			}
+			for (size_t i_ = 0; i_ < num_mid_line_size; ++i_)
+			{
+				double x, y, w;
+				x = transform_mat[0][0] * ptemp_mid_line->_array[i_].x + transform_mat[0][1] * ptemp_mid_line->_array[i_].y + transform_mat[0][2];
+				y = transform_mat[1][0] * ptemp_mid_line->_array[i_].x + transform_mat[1][1] * ptemp_mid_line->_array[i_].y + transform_mat[1][2];
+				w = transform_mat[2][0] * ptemp_mid_line->_array[i_].x + transform_mat[2][1] * ptemp_mid_line->_array[i_].y + transform_mat[2][2];
+				int dst_col = (int)round(x / w);
+				int dst_row = (int)round(y / w);
 				if (dst_col >= 0 && dst_col < dst_cols
 					&& dst_row >= 0 && dst_row < dst_rows)
 				{
-					perspective_mid_line[i_].x = dst_col;
-					perspective_mid_line[i_].y = dst_row;
+					ptemp_perspective_mid_line->_array[i_].x = dst_col;
+					ptemp_perspective_mid_line->_array[i_].y = dst_row;
 				}
-
-				x = transform_mat[0][0] * right_line[i_] + transform_mat[0][1] * i_ + transform_mat[0][2];
-				y = transform_mat[1][0] * right_line[i_] + transform_mat[1][1] * i_ + transform_mat[1][2];
-				w = transform_mat[2][0] * right_line[i_] + transform_mat[2][1] * i_ + transform_mat[2][2];
-				dst_col = (int)round(x / w);
-				dst_row = (int)round(y / w);
+			}
+			for (size_t i_ = 0; i_ < num_right_line_size; ++i_)
+			{
+				double x, y, w;
+				x = transform_mat[0][0] * ptemp_right_line->_array[i_].x + transform_mat[0][1] * ptemp_right_line->_array[i_].y + transform_mat[0][2];
+				y = transform_mat[1][0] * ptemp_right_line->_array[i_].x + transform_mat[1][1] * ptemp_right_line->_array[i_].y + transform_mat[1][2];
+				w = transform_mat[2][0] * ptemp_right_line->_array[i_].x + transform_mat[2][1] * ptemp_right_line->_array[i_].y + transform_mat[2][2];
+				int dst_col = (int)round(x / w);
+				int dst_row = (int)round(y / w);
 				if (dst_col >= 0 && dst_col < dst_cols
 					&& dst_row >= 0 && dst_row < dst_rows)
 				{
-					perspective_right_line[i_].x = dst_col;
-					perspective_right_line[i_].y = dst_row;
+					ptemp_perspective_right_line->_array[i_].x = dst_col;
+					ptemp_perspective_right_line->_array[i_].y = dst_row;
 				}
 			}
 		}
@@ -2018,7 +1984,7 @@ UserProcessRet CImgProcess::InternalUserProcess(unsigned char** pixel_mat_param,
 			delete[]user_input_data;
 		}
 		UserProcessRet ret = UserProcess(pixel_mat_param, img_process_param.rows, img_process_param.cols, user_rgb_mat,
-			left_line, mid_line, right_line,
+			GetAuxiliaryLines().pleft_line, GetAuxiliaryLines().pmid_line, GetAuxiliaryLines().pright_line,
 			is_show_left_line, is_show_mid_line, is_show_right_line,
 			threshold_val, transform_mat, user_input, user_output, &slope);
 		cv::resize(img_process_param, img_process_param, Size(ret.dst_cols, ret.dst_rows));
@@ -2340,7 +2306,7 @@ void CImgProcess::OnPaint()
 	);
 
 	// RGB服务
-	if (this->is_have_user_process)
+	if (this->IsHaveProcessSel(4))
 	{
 		for (int i = this->user_rgb_mat_vec.size() * m_zoom_val_process - 1; i >= 0; --i)
 		{
@@ -2579,112 +2545,6 @@ void CImgProcess::OnSize(UINT nType, int cx, int cy)
 		pWnd_rect_tab_mode->GetWindowRect(&rect_tab_mode);
 		ScreenToClient(&rect_tab_mode);
 	}
-
-	/*CWnd* pWnd_static_border = GetDlgItem(IDC_STATIC_BORDER);
-
-	CWnd* pWnd_coms = GetDlgItem(IDC_COMBO1);
-	CWnd* pWnd_baudrate = GetDlgItem(IDC_COMBO2);
-	CWnd* pWnd_databits = GetDlgItem(IDC_COMBO3);
-	CWnd* pWnd_check = GetDlgItem(IDC_COMBO4);
-	CWnd* pWnd_stopbit = GetDlgItem(IDC_COMBO5);
-	CWnd* pWnd_noerr = GetDlgItem(IDC_CHECK1);
-	CWnd* pWnd_reconnect = GetDlgItem(IDC_CHECK2);
-	CWnd* pWnd_static_1 = GetDlgItem(IDC_STATIC_1);
-	CWnd* pWnd_static_2 = GetDlgItem(IDC_STATIC_2);
-	CWnd* pWnd_static_3 = GetDlgItem(IDC_STATIC_3);
-	CWnd* pWnd_static_4 = GetDlgItem(IDC_STATIC_4);
-	CWnd* pWnd_static_5 = GetDlgItem(IDC_STATIC_5);
-	CWnd* pWnd_button = GetDlgItem(IDC_BUTTON3);
-	if (pWnd_static_1 && pWnd_static_2 && pWnd_static_3 && pWnd_static_4 && pWnd_static_5)
-	{
-		pWnd_static_1->GetWindowRect(&rect_s_1);
-		ScreenToClient(&rect_s_1);
-		pWnd_static_2->GetWindowRect(&rect_s_2);
-		ScreenToClient(&rect_s_2);
-		pWnd_static_3->GetWindowRect(&rect_s_3);
-		ScreenToClient(&rect_s_3);
-		pWnd_static_4->GetWindowRect(&rect_s_4);
-		ScreenToClient(&rect_s_4);
-		pWnd_static_5->GetWindowRect(&rect_s_5);
-		ScreenToClient(&rect_s_5);
-		pWnd_coms->GetWindowRect(&rect_coms);
-		ScreenToClient(&rect_coms);
-		pWnd_baudrate->GetWindowRect(&rect_baudrate);
-		ScreenToClient(&rect_baudrate);
-		pWnd_databits->GetWindowRect(&rect_databits);
-		ScreenToClient(&rect_databits);
-		pWnd_check->GetWindowRect(&rect_check);
-		ScreenToClient(&rect_check);
-		pWnd_stopbit->GetWindowRect(&rect_stopbit);
-		ScreenToClient(&rect_stopbit);
-		pWnd_noerr->GetWindowRect(&rect_noerr);
-		ScreenToClient(&rect_noerr);
-		pWnd_reconnect->GetWindowRect(&rect_reconnect);
-		ScreenToClient(&rect_reconnect);
-		pWnd_button->GetWindowRect(&rect_button);
-		ScreenToClient(&rect_button);
-	}
-
-	if (pWnd_static_border)
-	{
-		pWnd_static_border->SetWindowPos(NULL, client_rect.left + 20,
-			client_rect.top + 20,
-			rect_s_1.Width() + 50 + rect_coms.Width(),
-			rect_coms.Height() * 5 + rect_button.Height() + rect_noerr.Height() * 2 + 130,
-			SWP_NOZORDER);
-		pWnd_static_border->GetWindowRect(&rect_static_border);
-		ScreenToClient(&rect_static_border);
-
-		pWnd_static_1->SetWindowPos(NULL, rect_static_border.left + 25, rect_static_border.top + 35, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_static_1->GetWindowRect(&rect_s_1);
-		ScreenToClient(&rect_s_1);
-		pWnd_coms->SetWindowPos(NULL, rect_s_1.right, rect_s_1.top - (rect_coms.Height() - rect_s_1.Height()) / 2, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_coms->GetWindowRect(&rect_coms);
-		ScreenToClient(&rect_coms);
-
-		pWnd_static_2->SetWindowPos(NULL, rect_static_border.left + 25, rect_s_1.bottom + 15, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_static_2->GetWindowRect(&rect_s_2);
-		ScreenToClient(&rect_s_2);
-		pWnd_baudrate->SetWindowPos(NULL, rect_s_1.right, rect_s_2.top - (rect_baudrate.Height() - rect_s_2.Height()) / 2, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_baudrate->GetWindowRect(&rect_baudrate);
-		ScreenToClient(&rect_baudrate);
-
-		pWnd_static_3->SetWindowPos(NULL, rect_static_border.left + 25, rect_s_2.bottom + 15, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_static_3->GetWindowRect(&rect_s_3);
-		ScreenToClient(&rect_s_3);
-		pWnd_databits->SetWindowPos(NULL, rect_s_1.right, rect_s_3.top - (rect_databits.Height() - rect_s_3.Height()) / 2, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_databits->GetWindowRect(&rect_databits);
-		ScreenToClient(&rect_databits);
-
-		pWnd_static_4->SetWindowPos(NULL, rect_static_border.left + 25, rect_s_3.bottom + 15, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_static_4->GetWindowRect(&rect_s_4);
-		ScreenToClient(&rect_s_4);
-		pWnd_check->SetWindowPos(NULL, rect_s_1.right, rect_s_4.top - (rect_check.Height() - rect_s_4.Height()) / 2, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_check->GetWindowRect(&rect_check);
-		ScreenToClient(&rect_check);
-
-		pWnd_static_5->SetWindowPos(NULL, rect_static_border.left + 25, rect_s_4.bottom + 15, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_static_5->GetWindowRect(&rect_s_5);
-		ScreenToClient(&rect_s_5);
-		pWnd_stopbit->SetWindowPos(NULL, rect_s_1.right, rect_s_5.top - (rect_stopbit.Height() - rect_s_5.Height()) / 2, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		pWnd_stopbit->GetWindowRect(&rect_stopbit);
-		ScreenToClient(&rect_stopbit);
-
-		pWnd_button->SetWindowPos(NULL, rect_static_border.left + 40, rect_s_5.bottom + 50, rect_static_border.Width() - 80, rect_coms.Height() + 18, SWP_NOZORDER);
-		pWnd_button->GetWindowRect(&rect_button);
-		ScreenToClient(&rect_button);
-		pWnd_reconnect->SetWindowPos(NULL, (rect_static_border.Width() - rect_reconnect.Width()) / 2,
-			rect_static_border.bottom - 12 - rect_reconnect.Height(),
-			0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		pWnd_reconnect->GetWindowRect(&rect_reconnect);
-		ScreenToClient(&rect_reconnect);
-
-		pWnd_noerr->SetWindowPos(NULL, (rect_static_border.Width() - rect_reconnect.Width()) / 2,
-			rect_reconnect.top - rect_reconnect.Height() - 4,
-			0, 0, SWP_NOZORDER | SWP_NOSIZE);
-		pWnd_noerr->GetWindowRect(&rect_noerr);
-		ScreenToClient(&rect_noerr);
-	}*/
 
 	// 左下角区域
 	CWnd* pWnd_static_binary = GetDlgItem(IDC_STATIC_BINARY);

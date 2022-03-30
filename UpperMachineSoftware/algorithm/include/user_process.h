@@ -27,6 +27,20 @@ typedef struct UserRGB
 	unsigned char b;
 	bool is_show;
 }UserRGB;
+
+typedef struct Pos
+{
+	int x;
+	int y;
+}Pos;
+
+typedef struct LineArray
+{
+	Pos* _array;  // 数组指针, 注意该数组的内存全权交由dll处理
+	short _size;  // 数组的大小 
+	short _index; // 下次将使用的索引，注意！该值
+}LineArray;
+
 /*
 * @param:
 *				src_pixel_mat : 上一处理阶段得到的像素矩阵, 请勿自行释放该二维数组内存
@@ -48,7 +62,7 @@ typedef struct UserRGB
 * @brief : 该函数可留空
 */
 extern"C" USERPROCESS_API UserProcessRet UserProcess(unsigned char** src_pixel_mat, size_t src_rows, size_t src_cols, UserRGB * *user_rgb_mat,
-	size_t * left_line, size_t * mid_line, size_t * right_line,
+	LineArray * left_line, LineArray * mid_line, LineArray * right_line,
 	bool& is_show_left_line, bool& is_show_mid_line, bool& is_show_right_line,
 	unsigned int& threshold_value,
 	const double* const* perspective_transform_mat,

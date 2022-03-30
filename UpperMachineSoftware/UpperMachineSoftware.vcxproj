@@ -246,6 +246,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="to_file.hpp" />
     <ClInclude Include="UpperMachineSoftware.h" />
     <ClInclude Include="UpperMachineSoftwareDlg.h" />
   </ItemGroup>
