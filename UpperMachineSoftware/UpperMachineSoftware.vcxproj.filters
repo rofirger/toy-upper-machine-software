@@ -189,7 +189,7 @@
     <ClInclude Include="ChartClass\targetver.h">
       <Filter>Chart</Filter>
     </ClInclude>
-    <ClInclude Include="to_file.hpp">
+    <ClInclude Include="inc\to_file.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

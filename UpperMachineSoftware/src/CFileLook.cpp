@@ -276,6 +276,10 @@ BOOL CFileLook::PreTranslateMessage(MSG* pMsg)
 
 			break;
 		}
+		case VK_RETURN: // 避免dlg窗口编辑框按回车(Enter)键和ESC键会退出
+			return TRUE;
+		case VK_ESCAPE: // // 避免dlg窗口编辑框按回车(Enter)键和ESC键会退出
+			return TRUE;
 		default:
 			break;
 		}

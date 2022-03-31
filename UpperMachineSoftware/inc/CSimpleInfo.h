@@ -211,4 +211,5 @@ private:
 public:
 	CTabCtrl m_tab_mode;
 	afx_msg void OnTcnSelchangeTabMode(NMHDR* pNMHDR, LRESULT* pResult);
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };

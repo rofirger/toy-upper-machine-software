@@ -1701,9 +1701,16 @@ BOOL CImgProcess::PreTranslateMessage(MSG* pMsg)
 	default:
 		break;
 	}
-	//if (pMsg->message == WM_MOUSEMOVE) {
-	//	m_toolTip.RelayEvent(pMsg);
-	//}
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		switch (pMsg->wParam)
+		{
+		case VK_RETURN: // 避免dlg窗口编辑框按回车(Enter)键和ESC键会退出
+			return TRUE;
+		case VK_ESCAPE: // // 避免dlg窗口编辑框按回车(Enter)键和ESC键会退出
+			return TRUE;
+		}
+	}
 	return CDialogEx::PreTranslateMessage(pMsg);
 }
 

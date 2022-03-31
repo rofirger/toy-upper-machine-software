@@ -240,3 +240,18 @@ unsigned __stdcall ProcessFuncNetServer(LPVOID lpParam)
 	//ptr_forms->DataProcessFunc(ptr->data_process_func_param);
 	return 0;
 }
+
+BOOL CNetServer::PreTranslateMessage(MSG* pMsg)
+{
+	if (pMsg->message == WM_KEYDOWN)
+	{
+		switch (pMsg->wParam)
+		{
+		case VK_RETURN: // 避免dlg窗口编辑框按回车(Enter)键和ESC键会退出
+			return TRUE;
+		case VK_ESCAPE: // // 避免dlg窗口编辑框按回车(Enter)键和ESC键会退出
+			return TRUE;
+		}
+	}
+	return CDialogEx::PreTranslateMessage(pMsg);
+}

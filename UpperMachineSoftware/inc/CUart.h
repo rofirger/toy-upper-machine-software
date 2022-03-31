@@ -71,4 +71,5 @@ public:
 	CRect rect_stopbit;
 	CRect rect_button;
 	afx_msg void OnBnClickedMainButton();
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
 };
