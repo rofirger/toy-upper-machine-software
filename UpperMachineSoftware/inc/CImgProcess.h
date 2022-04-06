@@ -37,7 +37,12 @@ typedef struct AuxiliaryLinesStruct
 	LineArray* pmid_line;
 	LineArray* pright_line;
 }AuxiliaryLinesStruct;
-
+typedef enum RunningStatus
+{
+	PIXEL_SOURCE,
+	SIGNAL_SOURCE,
+	NO_WORK
+}RunningStatus;
 class CDragListCtrl :public CListCtrl
 {
 private:
@@ -122,6 +127,12 @@ public:
 			if (process_sel[i] == _sel)
 				return true;
 	}
+private:
+	// 软件数据源
+	RunningStatus running_status;
+public:
+	RunningStatus GetRunningStatus() { return running_status; }
+	void SetRunningStatus(const RunningStatus running_status_) { running_status = running_status_; }
 public:
 	CSerialPort mySerialPort;
 	Timer refresh_timer;

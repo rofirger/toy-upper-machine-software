@@ -73,6 +73,7 @@ public:
 	void* GetPtrFuncClearData() { return _ptr_func_clear_data; }
 	void* GetPtrFuncClearDataParam() { return _ptr_clear_data_func_param; }
 	bool GetControlEnable() { return _b_control; }
+	void* GetCallFormsPtr() { return _ptr_call_forms; }
 	Queue<QueueCacheDataType*>& GetDataQueue() { return _queue_data; }
 	size_t GetDataQueueDefaultEleSize() { return _num_data_queue_ele_default_size; }
 };

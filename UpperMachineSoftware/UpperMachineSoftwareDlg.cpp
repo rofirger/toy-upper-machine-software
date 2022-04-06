@@ -294,7 +294,7 @@ void CUpperMachineSoftwareDlg::DownloadFile(CString szUrl, CString szPath)
 	//在url后添加随机数，防止从IE缓存中读取。url后加随机数不会影响下载的。
 	//如果想要从缓存中提取那么就把下面的注释掉
 	CString szRand;
-	szRand.Format(_T("?skq=%d"), GetTickCount());
+	szRand.Format(_T("?skq=%d"), GetTickCount64());
 	szUrl += szRand;
 	rofirger::add_log(rofirger::LOG_LEVEL_INFO, "download {%ls} from {%ls}", szPath.GetBuffer(), szUrl.GetBuffer());
 	szUrl.ReleaseBuffer(); szPath.ReleaseBuffer();

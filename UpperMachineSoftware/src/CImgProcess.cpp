@@ -889,9 +889,9 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 		{
 			ptr->pixel_src_file_path_selected_index++;
 		}
-		if (ptr->pixel_src_file_path_selected_index >= ptr->pixel_src_file_path_selected.size())
+		if (ptr->GetRunningStatus() == PIXEL_SOURCE && ptr->pixel_src_file_path_selected_index >= ptr->pixel_src_file_path_selected.size())
 		{
-			ptr->is_start_pixel_src = false;
+			ptr->SetRunningStatus(NO_WORK);
 			ptr->pixel_src_file_path_selected_index = 0;
 			ptr->SetDlgItemText(IDC_BUTTON7, _T("开始"));
 			EnableControlForPixelSrc(ptr, true);
@@ -907,7 +907,7 @@ unsigned __stdcall RefleshPic(LPVOID lpParam)
 // 像素源
 void RefleshPicPixel(CImgProcess* ptr)
 {
-	if (ptr->is_start_pixel_src || ptr->is_single_step_pixel_src)
+	if (ptr->GetRunningStatus() == PIXEL_SOURCE || ptr->is_single_step_pixel_src)
 	{
 		// 更新 IDC_PIXEL_SRC_PATH 显示
 		ptr->SetDlgItemTextW(IDC_PIXEL_SRC_PATH, _T("[") + CString(std::to_string(ptr->pixel_src_file_path_selected_index + 1).c_str()) + _T("] ") + (ptr->pixel_src_path + ptr->pixel_src_file_path_selected[ptr->pixel_src_file_path_selected_index]));
@@ -1360,9 +1360,9 @@ void RefleshPicPixel(CImgProcess* ptr)
 		{
 			ptr->pixel_src_file_path_selected_index++;
 		}
-		if (ptr->pixel_src_file_path_selected_index >= ptr->pixel_src_file_path_selected.size())
+		if (ptr->GetRunningStatus() == PIXEL_SOURCE && ptr->pixel_src_file_path_selected_index >= ptr->pixel_src_file_path_selected.size())
 		{
-			ptr->is_start_pixel_src = false;
+			ptr->SetRunningStatus(NO_WORK);
 			ptr->pixel_src_file_path_selected_index = 0;
 			ptr->SetDlgItemText(IDC_BUTTON7, _T("开始"));
 			EnableControlForPixelSrc(ptr, true);
@@ -1978,7 +1978,7 @@ UserProcessRet CImgProcess::InternalUserProcess(unsigned char** pixel_mat_param,
 		int length_data = temp_user_input.GetLength();
 		if (length_data != 0)
 		{
-			char* user_input_data = new  char[length_data + 1];
+			char* user_input_data = new  char[length_data + (int)1];
 			user_input_data[0] = '\0';
 			LPWSTR t_u_i = temp_user_input.GetBuffer();
 			for (int i = 0; i < length_data; ++i)
@@ -2089,7 +2089,12 @@ void CImgProcess::OnNMClickList2(NMHDR* pNMHDR, LRESULT* pResult)
 		char* buffer;
 		EmptyClipboard();
 		int len = wcslen(source);
-		clipbuffer = GlobalAlloc(GMEM_DDESHARE, len + 1);
+		clipbuffer = GlobalAlloc(GMEM_DDESHARE, static_cast<size_t>(len + 1));
+		if (clipbuffer == 0)
+		{
+			rofirger::add_log(rofirger::LOG_LEVEL_FATAL, "GlobalAlloc return 0");
+			return;
+		}
 		buffer = (char*)GlobalLock(clipbuffer);
 		LPWSTR src = source.GetBuffer();
 		for (int i = 0; i <= len; ++i)
@@ -2474,9 +2479,8 @@ void CImgProcess::OnBnClickedButton7()
 			::MessageBox(NULL, _T("无像素源. 请添加像素文件"), _T("提示"), 0);
 			return;
 		}
-		is_start_pixel_src = true;
+		SetRunningStatus(PIXEL_SOURCE);
 		SetDlgItemText(IDC_BUTTON7, _T("暂停"));
-
 		WriteOperationInfoToFile();
 
 		// 求取透视变换矩阵
@@ -2500,7 +2504,7 @@ void CImgProcess::OnBnClickedButton7()
 	else if (now_botton_text != CString("开始"))
 	{
 		SetDlgItemText(IDC_BUTTON7, _T("开始"));
-		is_start_pixel_src = false;
+		SetRunningStatus(NO_WORK);
 		refresh_timer.Expire();
 		EnableControlForPixelSrc(this, true);
 		// 更新 IDC_PIXEL_SRC_PATH 显示
